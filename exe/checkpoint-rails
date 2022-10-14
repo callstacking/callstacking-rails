@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "checkpoint/rails"
+
+include Checkpoint::Rails::Settings
+
+action = ARGV[0]&.downcase&.strip
+
+if action.nil?
+  Checkpoint::Rails::Setup.instructions
+  exit!(1)
+end
+
+read_settings
+
+case action
+  when 'register'
+    `open #{settings.url || Checkpoint::Rails::Settings::PRODUCTION_URL}/users/sign_up`
+
+  when 'setup'
+    Checkpoint::Rails::Setup.new.start
+end
