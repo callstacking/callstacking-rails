@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-# Specify your gem's dependencies in checkpoint-rails.gemspec.
+# Specify your gem's dependencies in callstacking-rails.gemspec.
 gemspec
 
 gem "sqlite3"

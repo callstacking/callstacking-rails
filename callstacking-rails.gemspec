@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version     = Checkpoint::Rails::VERSION
   spec.authors     = ["Jim Jones"]
   spec.email       = ["jim.jones1@gmail.com"]
-  spec.homepage    = "https://github.com/rails-hackathon/team-21"
+  spec.homepage    = "https://github.com/callstacking/callstacking-rails"
   spec.summary     = "Rolling debugger that shows the full state of each call per request."
   spec.description = "Rolling debugger that shows the full state of each call."
   spec.license     = "MIT"

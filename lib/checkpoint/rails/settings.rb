@@ -11,7 +11,7 @@ module Checkpoint
         attr_accessor :settings
       end
 
-      SETTINGS_FILE = "#{Dir.home}/.checkpoint-rails"
+      SETTINGS_FILE = "#{Dir.home}/.callstacking-rails"
       PRODUCTION_URL = "https://callstacking.com"
 
       def url

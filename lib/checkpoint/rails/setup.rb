@@ -72,11 +72,11 @@ module Checkpoint
         puts
         puts "Usage: "
         puts
-        puts "  checkpoint-rails register"
-        puts "    Opens a browser window to register as a Market Hackers user."
+        puts "  callstacking-rails register"
+        puts "    Opens a browser window to register as a Callstacking user."
         puts
-        puts "  checkpoint-rails setup"
-        puts "    Interactively prompts you for your checkpoint-rails username/password, "
+        puts "  callstacking-rails setup"
+        puts "    Interactively prompts you for your Callstacking username/password, "
         puts "    Stores auth details in #{SETTINGS_FILE} "
         puts
         puts " You can have multiple environments."
@@ -86,7 +86,7 @@ module Checkpoint
         puts " By setting the RAILS_ENV environment you can maintain"
         puts " multiple settings."
         puts
-        puts "Questions? Create an issue: https://github.com/aantix/checkpoint-rails/issues"
+        puts "Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues"
       end
     end
   end

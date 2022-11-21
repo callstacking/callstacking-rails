@@ -1,6 +1,6 @@
 # Checkpoint::Rails
 
-Checkpoint Rails is a rolling, checkpoint debugger for Rails.  It records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).  
+Callstacking is a rolling, checkpoint debugger for Rails.  It records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).  
 
 You no longer need to debug with `binding.pry` or `puts` statements, as the entire callstack for a given request is captured.
 
@@ -35,15 +35,7 @@ Calls are visibly nested so that it's easy to see which calls are issued from wh
 Add this line to your application's Gemfile:
 
 ```ruby
-gem "checkpoint-rails"
-```
-
-Add the following to your routes file
-
-```
-  if Rails.env.development? || Rails.env.test?
-    mount Checkpoint::Rails::Engine, at: "/checkpoint"
-  end
+gem "callstacking-rails"
 ```
 
 And then execute:
@@ -52,21 +44,9 @@ $ bundle
 ```
 
 ## Usage
-Open `http://localhost:3000/checkpoint/` in a separate tab.
+When you open a page for your app, once the page has rendered, you will see an arrow on the right hand side.
 
-Then open another page from your app.  E.g. the main page `http://localhost:3000`
-
-Go back to the `http://localhost:3000/checkpoint/` tab. Observe the method call traces.
-
-## Demo
-
-You can view a demo here :
-
-https://yxveq.hatchboxapp.com/
-
-Click the "Checkpoint Debugger View" button.  The checkpoint debugger view opens in a separate tab.  Go back to https://yxveq.hatchboxapp.com/ and hit refresh.  
-
-As you browse the sample demo app, you'll see a breakdown of the method calls in the traces/checkpoint debugger view.
+Click the arrow, and observe the full callstack context.
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
