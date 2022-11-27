@@ -1,4 +1,4 @@
-module Checkpoint::Rails
+module Callstacking::Rails
   class TracesController < ApplicationController
     def index
     end

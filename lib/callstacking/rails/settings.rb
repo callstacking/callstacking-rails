@@ -1,8 +1,8 @@
 require "active_support/concern"
 require "active_support/core_ext/class/attribute_accessors"
-require "checkpoint/rails/env"
+require "callstacking/rails/env"
 
-module Checkpoint
+module Callstacking
   module Rails
     module Settings
       extend ActiveSupport::Concern
@@ -31,7 +31,7 @@ module Checkpoint
       end
 
       def read_settings
-        @@settings = @settings = complete_settings.dig(::Checkpoint::Rails::Env.environment, :settings)
+        @@settings = @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings)
       rescue StandardError => e
         puts e.full_message
         puts e.backtrace.join("\n")
@@ -39,7 +39,7 @@ module Checkpoint
       end
 
       def complete_settings
-        YAML.load(File.read(Checkpoint::Rails::Client::Base::SETTINGS_FILE)) rescue {}
+        YAML.load(File.read(Callstacking::Rails::Client::Base::SETTINGS_FILE)) rescue {}
       end
     end
   end

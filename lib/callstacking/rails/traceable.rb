@@ -1,14 +1,15 @@
 require "active_support/concern"
-require "checkpoint/rails/client/base"
-require "checkpoint/rails/client/authenticate"
-require "checkpoint/rails/client/trace"
-require "checkpoint/rails/settings"
+require "rails"
+require "callstacking/rails/client/base"
+require "callstacking/rails/client/authenticate"
+require "callstacking/rails/client/trace"
+require "callstacking/rails/settings"
 
-module Checkpoint
+module Callstacking
   module Rails
     module Traceable
       extend ActiveSupport::Concern
-      include Checkpoint::Rails::Settings
+      include Callstacking::Rails::Settings
 
       TARGET_DIV = 'traces'
 
@@ -17,7 +18,7 @@ module Checkpoint
       def set_trace
         read_settings
         
-        client = Checkpoint::Rails::Client::Trace.new
+        client = Callstacking::Rails::Client::Trace.new
 
         trace_points = {}
         params       = {}
@@ -29,7 +30,7 @@ module Checkpoint
         task         = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          next if payload[:controller] == 'Checkpoint::Rails::TracesController'
+          next if payload[:controller] == 'Callstacking::Rails::TracesController'
 
           key = request_key(payload)
           params[key] = payload[:params]
@@ -37,7 +38,7 @@ module Checkpoint
           nesting_level = -1
 
           request_id = payload[:request].request_id
-          Checkpoint::Rails::Traceable.current_request_id = request_id
+          Callstacking::Rails::Traceable.current_request_id = request_id
 
           trace_id, _interval = client.create(payload[:method],  payload[:controller],
                                               payload[:action],  payload[:format],
@@ -46,7 +47,7 @@ module Checkpoint
                                               payload[:headers], params[key])
 
 
-          puts "#{settings[:url] || Checkpoint::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
+          puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
 
           task = Concurrent::TimerTask.new(execution_interval: 1, timeout_interval: 60) {
             send_traces!(trace_id, traces, lock, client)
@@ -57,6 +58,7 @@ module Checkpoint
           create_message(start_request_message(payload), order_num, traces, lock)
 
           trace_points[key]&.disable
+
           trace_point = TracePoint.new(:call, :return) do |t|
             trace = caller[0]
 
@@ -153,7 +155,7 @@ module Checkpoint
       def send_traces!(trace_id, traces, lock, client)
         lock.synchronize do
           return if traces.empty?
-          
+
           client.upsert(trace_id, { traces: traces })
           traces.clear
         end

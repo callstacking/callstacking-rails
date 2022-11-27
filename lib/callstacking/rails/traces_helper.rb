@@ -1,17 +1,17 @@
-require "action_view/helpers/tag_helper.rb"
+require "action_view/helpers/tag_helper"
 require "action_view/context.rb"
 
-module Checkpoint
+module Callstacking
   module Rails
     module TracesHelper
       include ActionView::Helpers::TagHelper
       include ActionView::Context
-      include Checkpoint::Rails::Settings
+      include Callstacking::Rails::Settings
 
       def hud
         read_settings
 
-        frame_url = "#{url || Checkpoint::Rails::Settings::PRODUCTION_URL}/traces/#{Checkpoint::Rails::Traceable.current_request_id}/print"
+        frame_url = "#{url || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{Callstacking::Rails::Traceable.current_request_id}/print"
 
         body = []
         body << (content_tag( :div, data: { turbo:false },

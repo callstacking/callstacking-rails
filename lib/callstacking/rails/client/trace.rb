@@ -1,4 +1,4 @@
-module Checkpoint
+module Callstacking
   module Rails
     module Client
       class Trace < Base

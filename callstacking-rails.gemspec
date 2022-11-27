@@ -1,8 +1,8 @@
-require_relative "lib/checkpoint/rails/version"
+require_relative "lib/callstacking/rails/version"
 
 Gem::Specification.new do |spec|
   spec.name        = "callstacking-rails"
-  spec.version     = Checkpoint::Rails::VERSION
+  spec.version     = Callstacking::Rails::VERSION
   spec.authors     = ["Jim Jones"]
   spec.email       = ["jim.jones1@gmail.com"]
   spec.homepage    = "https://github.com/callstacking/callstacking-rails"

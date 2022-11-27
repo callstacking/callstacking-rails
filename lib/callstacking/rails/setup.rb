@@ -1,11 +1,11 @@
 require 'yaml'
-require "checkpoint/rails/settings"
+require "callstacking/rails/settings"
 
-module Checkpoint
+module Callstacking
   module Rails
     class Setup
-      include ::Checkpoint::Rails::Settings
-      extend ::Checkpoint::Rails::Settings
+      include ::Callstacking::Rails::Settings
+      extend ::Callstacking::Rails::Settings
 
       attr_accessor :client
 
@@ -14,17 +14,17 @@ module Checkpoint
       end
 
       def client
-        @client = Checkpoint::Rails::Client::Authenticate.new
+        @client = Callstacking::Rails::Client::Authenticate.new
       end
 
       def start
         email      = prompt("Enter email:")
         password   = prompt("Enter password:")
 
-        url = if Rails::Checkpoint::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
+        url = if Callstacking::Rails::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
                 PRODUCTION_URL
               else
-                prompt("Enter URL for #{Checkpoint::Rails::Env.environment} API calls [#{PRODUCTION_URL}]:") || PRODUCTION_URL
+                prompt("Enter URL for #{Callstacking::Rails::Env.environment} API calls [#{PRODUCTION_URL}]:") || PRODUCTION_URL
               end
 
         save(email, password, url)
@@ -53,13 +53,13 @@ module Checkpoint
                   url: url,
         }
 
-        props = { Checkpoint::Rails::Env.environment => {
+        props = { Callstacking::Rails::Env.environment => {
           settings: props
         } }
 
         write_settings(complete_settings.merge(props))
 
-        props[Checkpoint::Rails::Env.environment][:settings][:auth_token] = token(email, password)
+        props[Callstacking::Rails::Env.environment][:settings][:auth_token] = token(email, password)
 
         write_settings(complete_settings.merge(props))
 
@@ -68,23 +68,24 @@ module Checkpoint
 
       def self.instructions
         read_settings
-        puts "loading environment #{Checkpoint::Rails::Env.environment}"
+        puts "loading environment #{Callstacking::Rails::Env.environment}"
         puts
         puts "Usage: "
         puts
-        puts "  callstacking-rails register"
-        puts "    Opens a browser window to register as a Callstacking user."
+        puts "  > callstacking-rails register"
         puts
-        puts "  callstacking-rails setup"
-        puts "    Interactively prompts you for your Callstacking username/password, "
-        puts "    Stores auth details in #{SETTINGS_FILE} "
+        puts "    Opens a browser window to register as a callstacking.com user."
+        puts
+        puts "  > callstacking-rails setup"
+        puts
+        puts "    Interactively prompts you for your callstacking.com username/password."
+        puts "    Stores auth details in #{SETTINGS_FILE}"
         puts
         puts " You can have multiple environments."
-        puts "    Default is #{Rails::Checkpoint::Env::DEFAULT_ENVIRONMENT}."
+        puts " The default is #{Callstacking::Rails::Env::DEFAULT_ENVIRONMENT}."
         puts
-        puts " The #{Checkpoint::Rails::Env.environment}: section in the #{SETTINGS_FILE} contains your credentials."
-        puts " By setting the RAILS_ENV environment you can maintain"
-        puts " multiple settings."
+        puts " The #{Callstacking::Rails::Env.environment}: section in the #{SETTINGS_FILE} contains your credentials."
+        puts " By setting the RAILS_ENV environment you can maintain multiple settings."
         puts
         puts "Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues"
       end

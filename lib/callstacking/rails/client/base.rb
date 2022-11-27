@@ -1,14 +1,14 @@
 require 'faraday'
 require 'faraday/follow_redirects'
-require "checkpoint/rails/settings"
+require "callstacking/rails/settings"
 
-module Checkpoint
+module Callstacking
   module Rails
     module Client
       class Error < StandardError; end
 
       class Base
-        include Checkpoint::Rails::Settings
+        include Callstacking::Rails::Settings
 
         def initialize
           read_settings

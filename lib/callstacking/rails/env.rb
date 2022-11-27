@@ -1,4 +1,6 @@
-module Checkpoint
+require "active_support/inflector"
+
+module Callstacking
   module Rails
     class Env
       DEFAULT_ENVIRONMENT = "development"

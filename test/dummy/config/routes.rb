@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  mount Checkpoint::Rails::Engine => "/checkpoint-rails"
+  mount Callstacking::Rails::Engine => "/checkpoint-rails"
 end

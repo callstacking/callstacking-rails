@@ -1,6 +1,6 @@
 require 'json'
 
-module Checkpoint
+module Callstacking
   module Rails
     module Client
       class Error < StandardError; end
