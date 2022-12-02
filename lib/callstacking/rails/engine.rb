@@ -1,7 +1,10 @@
 require "rails"
-require "callstacking/rails/traceable"
+require "callstacking/rails/trace"
+require "callstacking/rails/span"
+require 'callstacking/rails/spans'
 require "callstacking/rails/setup"
 require "callstacking/rails/settings"
+require "callstacking/rails/loader"
 require "callstacking/rails/client/base"
 require "callstacking/rails/client/authenticate"
 require "callstacking/rails/client/trace"
@@ -11,7 +14,6 @@ module Callstacking
   module Rails
     class Engine < ::Rails::Engine
       isolate_namespace Callstacking::Rails
-      include ::Callstacking::Rails::Traceable
 
       initializer "engine_name.assets.precompile" do |app|
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
@@ -22,13 +24,20 @@ module Callstacking
           helper Callstacking::Rails::TracesHelper
           include Callstacking::Rails::TracesHelper
         end
+
+        Callstacking::Rails::Loader.new.on_load
       end
 
       initializer :append_before_action do
         ActionController::Base.send :after_action, :inject_hud
       end
 
-      set_trace
+      spans = Spans.new
+      trace = Trace.new(spans)
+
+      Callstacking::Rails::Span::ClassMethods.spans = spans
+
+      trace.tracing
     end
   end
 end
