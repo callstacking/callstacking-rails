@@ -1,3 +1,5 @@
+require 'rails'
+
 # https://stackoverflow.com/q/52932516
 module Callstacking
   module Rails
@@ -8,19 +10,22 @@ module Callstacking
 
       module ClassMethods
         mattr_accessor :spans
-        def method_added(method_name)
+        def add_method(method_name, klass)
           tmp_module = find_or_initialize_module
           return if tmp_module.instance_methods(false).include?(method_name)
 
           tmp_module.define_method(method_name) do |*args, &block|
             klass = self.class.to_s
             method_name = __method__
+
             path = method(__method__).super_method.source_location.first
             line_no = method(__method__).super_method.source_location.last
 
-            @@spans.call_entry(klass, method_name, path, line_no)
+            p,l = caller.find{|c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
+
+            @@spans.call_entry(klass, method_name, p || path, l || line_no)
             return_val = super(*args, &block)
-            @@spans.call_return(klass, method_name, path, line_no, return_val)
+            @@spans.call_return(klass, method_name, p || path, l || line_no, return_val)
             return_val
           end
         end
@@ -38,12 +43,18 @@ module Callstacking
         end
 
         def init(k)
+          # No need to init Modules - they'll get included in classes
+          #  and those classes can be wrapped.
+          return if k.class == Module
+
           methods = (k.instance_methods(false) + k.private_instance_methods(false) + k.protected_instance_methods(false) + k.methods(false)).uniq
           @filtered||=(Object.instance_methods + Object.private_instance_methods + Object.protected_instance_methods + Object.methods(false)).uniq
 
           relevant = methods - @filtered
 
-          relevant.each{|r| method_added(r)}
+          relevant.each do |r|
+            add_method(r, k)
+          end
         end
       end
     end

@@ -12,6 +12,7 @@ module Callstacking
       def on_load
         loader.on_load do |cpath, value, abspath|
           if abspath =~ root
+            puts "cpath = #{cpath} - #{abspath}"
             klass = cpath.constantize
             klass.include(Callstacking::Rails::Span)
             klass.init(klass)
