@@ -15,8 +15,8 @@ module Callstacking
           return if tmp_module.instance_methods.include?(method_name) ||
                       tmp_module.singleton_methods.include?(method_name)
 
-          m = klass.instance_method(method_name).source_location.first rescue nil
-          m||= klass.method(method_name).source_location.first rescue nil
+          m = (klass.instance_method(method_name).source_location.first rescue nil) ||
+                (klass.method(method_name).source_location.first rescue nil)
 
           # Only application level calls
           return unless m =~ /#{::Rails.root.to_s}/
@@ -34,7 +34,7 @@ module Callstacking
             return_val = super(*args, &block)
             @@spans.call_return(klass, method_name, p || path, l || line_no, return_val)
             
-            return_val.inspect
+            return_val
           end
         end
 

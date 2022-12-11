@@ -73,7 +73,7 @@ module Callstacking
       end
 
       def start_request_message(payload)
-        "Request: #{payload[:method]} #{payload[:controller]}##{payload[:action]} as #{payload[:format]}"
+        "Started request: #{payload[:method]} #{payload[:controller]}##{payload[:action]} as #{payload[:format]}"
       end
 
       def create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)

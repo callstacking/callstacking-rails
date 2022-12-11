@@ -17,15 +17,13 @@ module Callstacking
 
       def call_entry(klass, method_name, path, line_no)
         @nesting_level+=1
-        @order_num+=1
         @previous_entry = previous_event(klass, method_name)
-        @call_entry_callback.call(@nesting_level, @order_num, klass, method_name, path, line_no)
+        @call_entry_callback.call(@nesting_level, increment_order_num, klass, method_name, path, line_no)
       end
 
       def call_return(klass, method_name, path, line_no, return_val)
-        @order_num+=1
         @call_return_callback.call(coupled_callee(klass, method_name), @nesting_level,
-                                   @order_num, klass, method_name, path, line_no, return_val)
+                                   increment_order_num, klass, method_name, path, line_no, return_val.inspect)
         @nesting_level-=1
       end
 
