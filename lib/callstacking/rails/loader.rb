@@ -18,7 +18,18 @@ module Callstacking
             klass.init(klass)
           end
         end
+
         trace.enable
+
+        instrument_method(ActionView::PartialRenderer, :render)
+        instrument_method(ActionView::TemplateRenderer, :render)
+      end
+
+      def instrument_method(klass, method)
+        return if klass.ancestors.map(&:to_s).index("Callstacking::Rails::Span")
+        
+        klass.include(Callstacking::Rails::Span)
+        klass.instrument_method(klass, method, application_level: false)
       end
     end
   end

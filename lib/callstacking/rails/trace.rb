@@ -24,7 +24,6 @@ module Callstacking
       def tracing
         read_settings
 
-        task = nil
         trace_id = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
@@ -40,13 +39,7 @@ module Callstacking
                                               payload[:params])
 
           puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
-
-          task = Concurrent::TimerTask.new(execution_interval: 1, timeout_interval: 60) {
-            send_traces!(trace_id, @traces)
-          }
-
-          task.execute
-
+          
           create_message(start_request_message(payload), spans.increment_order_num, @traces)
         end
 
@@ -59,8 +52,6 @@ module Callstacking
         end
 
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
-          task&.shutdown
-
           create_message(completed_request_message(payload), spans.increment_order_num, @traces)
           send_traces!(trace_id, @traces)
         end
@@ -83,11 +74,11 @@ module Callstacking
                                      nesting_level: nesting_level,
                                      trace_entryable_attributes: {
                                        local_variables: {},
-                                       klass: klass,
+                                       klass: klass_name(klass),
                                        line_number: line_no,
                                        path: path,
                                        method_name: method_name,
-                                       return_value: return_val,
+                                       return_value: return_val.inspect,
                                        coupled_callee: coupled_callee,
                                      } } }
         end
@@ -100,7 +91,7 @@ module Callstacking
                                      nesting_level: nesting_level,
                                      trace_entryable_attributes: {
                                        #args: arguments_for(t),
-                                       klass: klass,
+                                       klass: klass_name(klass),
                                        line_number: line_no,
                                        path: path,
                                        method_name: method_name,
@@ -126,6 +117,11 @@ module Callstacking
           client.upsert(trace_id, { traces: traces })
           traces.clear
         end
+      end
+
+      private
+      def klass_name(klass)
+        (klass.is_a?(Class) ? klass.name : klass.class.name)
       end
     end
   end

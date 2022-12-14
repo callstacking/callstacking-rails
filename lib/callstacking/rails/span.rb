@@ -10,7 +10,7 @@ module Callstacking
 
       module ClassMethods
         mattr_accessor :spans
-        def add_method(method_name, klass)
+        def instrument_method(klass, method_name, application_level: true)
           tmp_module = find_or_initialize_module(klass)
           return if tmp_module.instance_methods.include?(method_name) ||
                       tmp_module.singleton_methods.include?(method_name)
@@ -18,17 +18,19 @@ module Callstacking
           m = (klass.instance_method(method_name).source_location.first rescue nil) ||
                 (klass.method(method_name).source_location.first rescue nil)
 
-          # Only application level calls
-          return unless m =~ /#{::Rails.root.to_s}/
+          # Application level method definitions
+          return unless m =~ /#{::Rails.root.to_s}/ if application_level
 
           tmp_module.define_method(method_name) do |*args, &block|
-            klass = self.class.to_s
+            klass = self.class
             method_name = __method__
 
             path = method(__method__).super_method.source_location.first
             line_no = method(__method__).super_method.source_location.last
 
             p,l = caller.find{|c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
+
+            puts "  method = #{method_name}"
 
             @@spans.call_entry(klass, method_name, p || path, l || line_no)
             return_val = super(*args, &block)
@@ -54,20 +56,18 @@ module Callstacking
           ancestors[module_index]
         end
 
-        def init(k)
-          methods = (k.instance_methods +
-                     k.private_instance_methods(false) +
-                     k.protected_instance_methods(false) +
-                     k.methods +
-                     k.singleton_methods).uniq
+        def init(klass)
+          methods = (klass.instance_methods +
+                     klass.private_instance_methods(false) +
+                     klass.protected_instance_methods(false) +
+                     klass.methods +
+                     klass.singleton_methods).uniq
 
-          @filtered||=(Object.instance_methods + Object.private_instance_methods + Object.protected_instance_methods + Object.methods(false)).uniq
+          @filtered||=(Object.instance_methods + Object.private_instance_methods +
+                         Object.protected_instance_methods + Object.methods(false)).uniq
 
           relevant = methods - @filtered
-
-          relevant.each do |r|
-            add_method(r, k)
-          end
+          relevant.each { |method| instrument_method(klass, method) }
         end
       end
     end
