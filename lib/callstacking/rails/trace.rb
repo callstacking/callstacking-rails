@@ -4,7 +4,6 @@ require "callstacking/rails/client/base"
 require "callstacking/rails/client/authenticate"
 require "callstacking/rails/client/trace"
 require "callstacking/rails/settings"
-require "callstacking/rails/span"
 
 module Callstacking
   module Rails
@@ -16,8 +15,9 @@ module Callstacking
 
       def initialize(spans)
         @traces = []
-        @lock = Mutex.new
-        @spans = spans
+        @spans  = spans
+
+        @lock   = Mutex.new
         @client = Callstacking::Rails::Client::Trace.new
       end
 
@@ -27,8 +27,6 @@ module Callstacking
         trace_id = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          next if payload[:controller] == 'Callstacking::Rails::TracesController'
-
           request_id = payload[:request].request_id
           Callstacking::Rails::Trace.current_request_id = request_id
 
