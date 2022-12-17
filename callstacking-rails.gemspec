@@ -8,16 +8,17 @@ Gem::Specification.new do |spec|
   spec.homepage    = "https://github.com/callstacking/callstacking-rails"
   spec.summary     = "Rolling debugger that shows the full state of each call per request."
   spec.description = "Rolling debugger that shows the full state of each call."
-  spec.license     = "MIT"
+  spec.license     = "GLP3"
   spec.bindir      = "exe"
-  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/callstacking/callstacking-rails"
 
   spec.files = Dir.chdir(File.expand_path(__dir__)) do
-    Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+    Dir["{app,config,db,lib,exe}/**/*", "LICENSE", "Rakefile", "README.md"]
   end
+  
+  spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
 
   spec.add_dependency "rails", ">= 4"
   spec.add_dependency "faraday", "~> 2.5"

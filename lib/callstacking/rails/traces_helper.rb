@@ -15,11 +15,11 @@ module Callstacking
 
         body = []
         body << (content_tag( :div, data: { turbo:false },
-                    style: 'background-color: #FFF; color: #0000FF; font-size: 20pt; top: 50%; right: 20px;
-                            padding: 30px 10px 0px 10px; position: fixed; height: 100px; width: 40px; cursor: pointer;',
+                    style: 'background-color: #FFF; font-size: 20pt; top: 50%; right: 10px; font-size: 36pt;
+                            padding: 0px; position: fixed; height: 50px; width: 40px; cursor: pointer;',
                     onclick: 'document.getElementById("callstacking-debugger").style.display = "unset";
                               document.getElementById("callstacking-close").style.display = "unset";') do
-          "⇐"
+          "<<"
         end)
         
         body << (content_tag(:iframe, src: frame_url, id: 'callstacking-debugger', data: { turbo:false },

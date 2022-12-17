@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
-require "callstacking/rails"
+require "callstacking/rails/setup"
+require "callstacking/rails/settings"
 
 include Callstacking::Rails::Settings
 
@@ -20,4 +21,12 @@ case action
 
   when 'setup'
     Callstacking::Rails::Setup.new.start
+
+  when 'enable'
+    Callstacking::Rails::Setup.new.enable_disable
+    puts "Callstacking tracing enabled (#{Callstacking::Rails::Env.environment})"
+
+  when 'disable'
+    Callstacking::Rails::Setup.new.enable_disable(enabled: false)
+    puts "Callstacking tracing disabled (#{Callstacking::Rails::Env.environment})"
 end

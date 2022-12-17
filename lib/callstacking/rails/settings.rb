@@ -30,6 +30,14 @@ module Callstacking
         File.write(SETTINGS_FILE, new_settings.to_yaml)
       end
 
+      def enabled?
+        settings[:enabled]
+      end
+
+      def disabled?
+        !enabled?
+      end
+
       def read_settings
         @@settings = @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings)
       rescue StandardError => e
@@ -39,7 +47,7 @@ module Callstacking
       end
 
       def complete_settings
-        YAML.load(File.read(Callstacking::Rails::Client::Base::SETTINGS_FILE)) rescue {}
+        YAML.load(File.read(SETTINGS_FILE)) rescue {}
       end
     end
   end

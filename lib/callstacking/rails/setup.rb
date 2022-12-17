@@ -1,5 +1,7 @@
 require 'yaml'
 require "callstacking/rails/settings"
+require "callstacking/rails/client/authenticate"
+require "callstacking/rails/env"
 
 module Callstacking
   module Rails
@@ -35,6 +37,16 @@ module Callstacking
         puts "Problem authenticating: #{e.message}"
       end
 
+      def enable_disable(enabled: true)
+        settings[:enabled] = enabled
+
+        props = { Callstacking::Rails::Env.environment => {
+          settings: settings
+        } }
+
+        write_settings(complete_settings.merge(props))
+      end
+
       def prompt(label)
         puts label
         value = STDIN.gets.chomp
@@ -51,6 +63,7 @@ module Callstacking
       def save(email, password, url)
         props = { auth_token: '',
                   url: url,
+                  enabled: true
         }
 
         props = { Callstacking::Rails::Env.environment => {
@@ -71,6 +84,14 @@ module Callstacking
         puts "loading environment #{Callstacking::Rails::Env.environment}"
         puts
         puts "Usage: "
+        puts
+        puts "  > callstacking-rails enable"
+        puts
+        puts "    Enables the callstacking tracing."
+        puts
+        puts "  > callstacking-rails disable"
+        puts
+        puts "    Disables the callstacking tracing."
         puts
         puts "  > callstacking-rails register"
         puts

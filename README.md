@@ -44,9 +44,39 @@ $ bundle
 ```
 
 ## Usage
-When you open a page for your app, once the page has rendered, you will see an arrow on the right hand side.
+Usage:
 
-Click the arrow, and observe the full callstack context.
+> callstacking-rails enable
+
+Enables the callstacking tracing.
+
+> callstacking-rails disable
+
+Disables the callstacking tracing.
+
+> callstacking-rails register
+
+Opens a browser window to register as a callstacking.com user.
+
+> callstacking-rails setup
+
+Interactively prompts you for your callstacking.com username/password.
+Stores auth details in `~/.callstacking-rails`.
+
+You can have multiple environments.
+The default is `development`.
+
+The `development:` section in the `~/.callstacking-rails` config contains your credentials.
+
+By setting the RAILS_ENV environment you can maintain multiple settings.
+
+Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues
+
+
+## Trace Output
+When you open a page for your app, once the page has rendered, you will see an `<<` arrow on the right hand side.
+
+Click the arrows, and observe the full callstack context.
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).

@@ -1,4 +1,5 @@
 require 'json'
+require "callstacking/rails/client/base"
 
 module Callstacking
   module Rails

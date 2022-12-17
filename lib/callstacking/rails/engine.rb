@@ -13,7 +13,10 @@ require "callstacking/rails/traces_helper"
 module Callstacking
   module Rails
     class Engine < ::Rails::Engine
+      include Settings
       isolate_namespace Callstacking::Rails
+
+      read_settings
 
       spans = Spans.new
       trace = Trace.new(spans)
@@ -28,14 +31,19 @@ module Callstacking
           include Callstacking::Rails::TracesHelper
         end
 
-        Callstacking::Rails::Loader.new.on_load(spans)
+        Callstacking::Rails::Loader.new.on_load(spans) if enabled?
       end
 
       initializer :append_before_action do
         ActionController::Base.send :after_action, :inject_hud
       end
 
-      trace.tracing
+      if enabled?
+        puts "Callstacking enabled (#{Callstacking::Rails::Env.environment})"
+        trace.tracing
+      else
+        puts "Callstacking disabled (#{Callstacking::Rails::Env.environment})"
+      end
     end
   end
 end

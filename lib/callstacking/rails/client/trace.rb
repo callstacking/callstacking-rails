@@ -1,3 +1,5 @@
+require "callstacking/rails/client/base"
+
 module Callstacking
   module Rails
     module Client
