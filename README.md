@@ -42,6 +42,19 @@ And then execute:
 ```bash
 $ bundle
 ```
+   
+Register an account at Callstacking.com
+```bash
+callstacking-rails register
+```
+
+Authenticate to your newly created account.
+
+```bash
+callstacking-rails setup
+```
+            
+You're now ready to start tracing.
 
 ## Usage
 Usage:
