@@ -92,4 +92,4 @@ When you open a page for your app, once the page has rendered, you will see an `
 Click the arrows, and observe the full callstack context.
 
 ## License
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.en.html).
