@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = "https://github.com/callstacking/callstacking-rails"
   spec.summary     = "Rolling debugger that shows the full state of each call per request."
   spec.description = "Rolling debugger that shows the full state of each call."
-  spec.license     = "GLP3"
+  spec.license     = "GPL-3.0-or-later"
   spec.bindir      = "exe"
 
   spec.metadata["homepage_uri"] = spec.homepage

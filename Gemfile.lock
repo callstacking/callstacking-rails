@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    callstacking-rails (0.1.2)
+    callstacking-rails (0.1.0)
       faraday (~> 2.5)
       faraday-follow_redirects
       rails (>= 4)
