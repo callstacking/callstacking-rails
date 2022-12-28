@@ -20,10 +20,10 @@ module Callstacking
         @nesting_level
       end
 
-      def call_entry(klass, method_name, path, line_no)
+      def call_entry(klass, method_name, arguments, path, line_no)
         @nesting_level+=1
         @previous_entry = previous_event(klass, method_name)
-        @call_entry_callback.call(@nesting_level, increment_order_num, klass, method_name, path, line_no)
+        @call_entry_callback.call(@nesting_level, increment_order_num, klass, method_name, arguments, path, line_no)
       end
 
       def call_return(klass, method_name, path, line_no, return_val)
@@ -38,25 +38,6 @@ module Callstacking
 
       def on_call_return(&block)
         @call_return_callback = block
-      end
-
-      def arguments_for(trace)
-        param_names = trace&.parameters&.map(&:last)
-        return {} if param_names.nil?
-
-        param_names.map do |param|
-          next if [:&, :*, :**].include?(param)
-          [param, trace.binding.local_variable_get(param.to_s)]
-        end.compact.to_h
-      end
-
-      def locals_for(trace)
-        local_names = trace&.binding&.local_variables
-        return {} if local_names.nil?
-
-        local_names.map do |local|
-          [local, trace.binding.local_variable_get(local)]
-        end.to_h
       end
 
       private

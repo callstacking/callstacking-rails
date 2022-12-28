@@ -41,8 +41,8 @@ module Callstacking
           create_message(start_request_message(payload), spans.increment_order_num, @traces)
         end
 
-        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, path, line_no|
-          create_call_entry(nesting_level, order_num, klass, method_name, path, line_no, @traces)
+        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
+          create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
         end
 
         @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
@@ -82,13 +82,13 @@ module Callstacking
         end
       end
 
-      def create_call_entry(nesting_level, order_num, klass, method_name, path, line_no, traces)
+      def create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
           traces << { trace_entry: { trace_entryable_type: 'TraceCallEntry',
                                      order_num: order_num,
                                      nesting_level: nesting_level,
                                      trace_entryable_attributes: {
-                                       #args: arguments_for(t),
+                                       args: arguments,
                                        klass: klass_name(klass),
                                        line_number: line_no,
                                        path: path,

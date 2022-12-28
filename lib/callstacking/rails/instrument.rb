@@ -36,7 +36,9 @@ module Callstacking
           spans = tmp_module.instance_variable_get(:@spans)
           klass = tmp_module.instance_variable_get(:@klass)
 
-          spans.call_entry(klass, method_name, p || path, l || line_no)
+          arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
+          
+          spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
           return_val = super(*args, &block)
           spans.call_return(klass, method_name, p || path, l || line_no, return_val)
 
@@ -66,6 +68,16 @@ module Callstacking
       def instrument_klass(application_level: true)
         relevant = all_methods - filtered
         relevant.each { |method| instrument_method(method, application_level: application_level) }
+      end
+
+      def self.arguments_for(m, args)
+        param_names = m.parameters&.map(&:last)
+        return {} if param_names.nil?
+
+        param_names.map.with_index do |param, index|
+          next if [:&, :*, :**].include?(param)
+          [param, args[index]]
+        end.compact.to_h
       end
 
       private
