@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors     = ["Jim Jones"]
   spec.email       = ["jim.jones1@gmail.com"]
   spec.homepage    = "https://github.com/callstacking/callstacking-rails"
-  spec.summary     = "Rolling debugger that shows the full state of each call per request."
-  spec.description = "Rolling debugger that shows the full state of each call."
+  spec.summary     = "Quickly visualize which methods call which, their parameters, and return values."
+  spec.description = "Quickly visualize which methods call which, their parameters, and return values."
   spec.license     = "GPL-3.0-or-later"
   spec.bindir      = "exe"
 
