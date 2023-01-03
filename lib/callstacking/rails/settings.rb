@@ -11,7 +11,7 @@ module Callstacking
         attr_accessor :settings
       end
 
-      SETTINGS_FILE = "#{Dir.home}/.callstacking-rails"
+      SETTINGS_FILE = "#{Dir.home}/.callstacking"
       PRODUCTION_URL = "https://callstacking.com"
 
       def url

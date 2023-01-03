@@ -74,12 +74,12 @@ Opens a browser window to register as a callstacking.com user.
 > callstacking-rails setup
 
 Interactively prompts you for your callstacking.com username/password.
-Stores auth details in `~/.callstacking-rails`.
+Stores auth details in `~/.callstacking`.
 
 You can have multiple environments.
 The default is `development`.
 
-The `development:` section in the `~/.callstacking-rails` config contains your credentials.
+The `development:` section in the `~/.callstacking` config contains your credentials.
 
 By setting the RAILS_ENV environment you can maintain multiple settings.
 
