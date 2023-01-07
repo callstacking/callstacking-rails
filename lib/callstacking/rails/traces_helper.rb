@@ -5,6 +5,7 @@ module Callstacking
   module Rails
     module TracesHelper
       include ActionView::Helpers::TagHelper
+      include ActionView::Helpers::JavaScriptHelper
       include ActionView::Context
       include Callstacking::Rails::Settings
 
@@ -27,6 +28,18 @@ module Callstacking
                             z-index: 99; opacity: 1.0; background-color: #FFF; color: #000; border: 1px solid;
                             margin: 0; padding: 0; box-shadow: 5px 5px; display: none;") do
         end)
+
+        body << (javascript_tag('
+          document.onkeyup = function(e) {
+            // Mac - option-d   Win - alt-d
+            if (e.altKey && e.which == 68) {
+              if (document.getElementById("callstacking-debugger").style.display === "none") {
+                document.getElementById("callstacking-debugger").style.display = "block";
+              } else {
+                document.getElementById("callstacking-debugger").style.display = "none";
+              }
+            }
+          };'))
         
         body.join
       end
