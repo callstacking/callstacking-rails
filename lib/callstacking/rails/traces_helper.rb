@@ -20,7 +20,7 @@ module Callstacking
                             padding: 0px; position: fixed; height: 50px; width: 40px; cursor: pointer;',
                     onclick: 'document.getElementById("callstacking-debugger").style.display = "unset";
                               document.getElementById("callstacking-close").style.display = "unset";') do
-          "💥"
+          "<span title='ctrl-d'><center>💥</center></span>".html_safe
         end)
         
         body << (content_tag(:iframe, src: frame_url, id: 'callstacking-debugger', data: { turbo:false },
@@ -32,9 +32,10 @@ module Callstacking
         body << (javascript_tag('
           document.onkeyup = function(e) {
             // Mac - option-d   Win - alt-d
-            if (e.altKey && e.which == 68) {
+            if (e.ctrlKey && e.which == 68) {
               if (document.getElementById("callstacking-debugger").style.display === "none") {
                 document.getElementById("callstacking-debugger").style.display = "block";
+                document.getElementById("callstacking-debugger").focus();
               } else {
                 document.getElementById("callstacking-debugger").style.display = "none";
               }
