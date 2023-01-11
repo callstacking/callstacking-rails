@@ -46,6 +46,8 @@ module Callstacking
       end
 
       def inject_hud
+        return unless enabled?
+        
         response.body = response.body.sub(/<\/body>/i, "#{hud}</body>")
       end
     end

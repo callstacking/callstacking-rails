@@ -23,7 +23,7 @@ module Callstacking
       end
 
       def auth_token?
-        auth_token.present?
+        !auth_token.nil?
       end
 
       def write_settings(new_settings)
@@ -31,6 +31,7 @@ module Callstacking
       end
 
       def enabled?
+        return false if settings.nil?
         settings[:enabled]
       end
 

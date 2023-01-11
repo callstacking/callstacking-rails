@@ -27,12 +27,12 @@ module Callstacking
         trace_id = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          request_id = payload[:request].request_id
+          request_id = payload[:request]&.request_id || SecureRandom.uuid
           Callstacking::Rails::Trace.current_request_id = request_id
 
           trace_id, _interval = client.create(payload[:method], payload[:controller],
                                               payload[:action], payload[:format],
-                                              ::Rails.root, payload[:request].original_url,
+                                              ::Rails.root, payload[:request]&.original_url,
                                               request_id, payload[:headers],
                                               payload[:params])
 

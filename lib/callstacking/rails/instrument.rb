@@ -22,7 +22,8 @@ module Callstacking
 
         tmp_module = find_or_initialize_module
 
-        return if tmp_module.instance_methods.include?(method_name) ||
+        return if tmp_module.nil? ||
+                    tmp_module.instance_methods.include?(method_name) ||
                     tmp_module.singleton_methods.include?(method_name)
 
         tmp_module.define_method(method_name) do |*args, &block|
@@ -37,7 +38,7 @@ module Callstacking
           klass = tmp_module.instance_variable_get(:@klass)
 
           arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
-          
+
           spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
           return_val = super(*args, &block)
           spans.call_return(klass, method_name, p || path, l || line_no, return_val)
@@ -47,6 +48,8 @@ module Callstacking
       end
 
       def find_or_initialize_module
+        return if klass&.name == nil
+
         module_name = "#{klass.name.gsub('::', '')}Span"
         module_index = klass.ancestors.map(&:to_s).index(module_name)
 
@@ -74,10 +77,14 @@ module Callstacking
         param_names = m.parameters&.map(&:last)
         return {} if param_names.nil?
 
-        param_names.map.with_index do |param, index|
+        h = param_names.map.with_index do |param, index|
           next if [:&, :*, :**].include?(param)
           [param, args[index]]
         end.compact.to_h
+
+        filter = ::Rails.application.config.filter_parameters
+        f = ActiveSupport::ParameterFilter.new filter
+        f.filter h
       end
 
       private
