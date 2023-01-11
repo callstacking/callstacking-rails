@@ -26,7 +26,7 @@ module Callstacking
                     tmp_module.instance_methods.include?(method_name) ||
                     tmp_module.singleton_methods.include?(method_name)
 
-        tmp_module.define_method(method_name) do |*args, &block|
+        tmp_module.define_method(method_name) do |*args, **kwargs, &block|
           method_name = __method__
 
           path = method(__method__).super_method.source_location.first
@@ -40,7 +40,7 @@ module Callstacking
           arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
           spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
-          return_val = super(*args, &block)
+          return_val = super(*args, **kwargs, &block)
           spans.call_return(klass, method_name, p || path, l || line_no, return_val)
 
           return_val
