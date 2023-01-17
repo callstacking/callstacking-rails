@@ -20,6 +20,9 @@ module Callstacking
       end
 
       def start
+        puts "Login to callstacking.com"
+        puts
+        
         email      = prompt("Enter email:")
         password   = prompt("Enter password:")
 

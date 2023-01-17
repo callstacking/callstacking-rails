@@ -27,18 +27,9 @@ module Callstacking
         trace_id = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          request_id = payload[:request]&.request_id || SecureRandom.uuid
-          Callstacking::Rails::Trace.current_request_id = request_id
-
-          trace_id, _interval = client.create(payload[:method], payload[:controller],
-                                              payload[:action], payload[:format],
-                                              ::Rails.root, payload[:request]&.original_url,
-                                              request_id, payload[:headers],
-                                              payload[:params])
-
-          puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
-          
-          create_message(start_request_message(payload), spans.increment_order_num, @traces)
+          trace_id = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
+                                   payload[:action], payload[:format], ::Rails.root,
+                                   payload[:original_url], payload[:headers], payload[:params])
         end
 
         @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
@@ -50,19 +41,18 @@ module Callstacking
         end
 
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
-          create_message(completed_request_message(payload), spans.increment_order_num, @traces)
-          send_traces!(trace_id, @traces)
+          complete_request(payload[:method], payload[:controller], payload[:action], payload[:format], trace_id)
         end
       end
 
       private
 
-      def completed_request_message(payload)
-        "Completed request: #{payload[:method]} #{payload[:controller]}##{payload[:action]} as #{payload[:format]}"
+      def completed_request_message(method, controller, action, format)
+        "Completed request: #{method} #{controller}##{action} as #{format}"
       end
 
-      def start_request_message(payload)
-        "Started request: #{payload[:method]} #{payload[:controller]}##{payload[:action]} as #{payload[:format]}"
+      def start_request_message(method, controller, action, format)
+        "Started request: #{method} #{controller}##{action} as #{format}"
       end
 
       def create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
@@ -81,7 +71,6 @@ module Callstacking
                                      } } }
         end
       end
-
       def create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
           traces << { trace_entry: { trace_entryable_type: 'TraceCallEntry',
@@ -116,8 +105,28 @@ module Callstacking
           traces.clear
         end
       end
+      def start_request(request_id, method, controller, action, format, path, original_url, headers, params)
+        request_id = request_id || SecureRandom.uuid
+        Callstacking::Rails::Trace.current_request_id = request_id
 
-      private
+        trace_id, _interval = client.create(method, controller, action, format,
+                                            path, original_url, request_id, headers,
+                                            params)
+
+        puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
+
+        create_message(start_request_message(method, controller, action, format),
+                       spans.increment_order_num, @traces)
+
+        trace_id
+      end
+
+      def complete_request(method, controller, action, format, trace_id)
+        create_message(completed_request_message(method, controller, action, format),
+                       spans.increment_order_num, @traces)
+        send_traces!(trace_id, @traces)
+      end
+
       def klass_name(klass)
         (klass.is_a?(Class) ? klass.name : klass.class.name)
       end

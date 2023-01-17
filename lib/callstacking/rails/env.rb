@@ -3,7 +3,7 @@ require "active_support/inflector"
 module Callstacking
   module Rails
     class Env
-      DEFAULT_ENVIRONMENT = "development"
+      DEFAULT_ENVIRONMENT = 'development'.freeze
 
       cattr_accessor :environment
 
