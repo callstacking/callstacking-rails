@@ -21,7 +21,11 @@ module Callstacking
                         p: params.to_h,
                       })
 
-          return resp.body["trace_id"], resp.body["pulse_interval"]
+          if resp.status == 200
+            return resp.body["trace_id"], resp.body["pulse_interval"], resp.body["max_trace_entries"]
+          end
+
+          nil
         end
 
         def upsert(trace_id, traces)

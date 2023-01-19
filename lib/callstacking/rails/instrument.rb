@@ -48,7 +48,8 @@ module Callstacking
       end
 
       def find_or_initialize_module
-        return if klass&.name == nil
+        name = klass&.name rescue nil
+        return if name.nil?
 
         module_name = "#{klass.name.gsub('::', '')}Span"
         module_index = klass.ancestors.map(&:to_s).index(module_name)

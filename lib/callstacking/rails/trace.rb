@@ -25,11 +25,12 @@ module Callstacking
         read_settings
 
         trace_id = nil
+        max_trace_entries = nil
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          trace_id = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
-                                   payload[:action], payload[:format], ::Rails.root,
-                                   payload[:original_url], payload[:headers], payload[:params])
+          trace_id, max_trace_entries = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
+                                                       payload[:action], payload[:format], ::Rails.root,
+                                                       payload[:original_url], payload[:headers], payload[:params])
         end
 
         @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
@@ -41,7 +42,9 @@ module Callstacking
         end
 
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
-          complete_request(payload[:method], payload[:controller], payload[:action], payload[:format], trace_id)
+          complete_request(payload[:method], payload[:controller],
+                           payload[:action], payload[:format],
+                           trace_id, max_trace_entries)
         end
       end
 
@@ -66,11 +69,12 @@ module Callstacking
                                        line_number: line_no,
                                        path: path,
                                        method_name: method_name,
-                                       return_value: return_val.inspect,
+                                       return_value: return_value(return_val),
                                        coupled_callee: coupled_callee,
                                      } } }
         end
       end
+
       def create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
           traces << { trace_entry: { trace_entryable_type: 'TraceCallEntry',
@@ -109,22 +113,34 @@ module Callstacking
         request_id = request_id || SecureRandom.uuid
         Callstacking::Rails::Trace.current_request_id = request_id
 
-        trace_id, _interval = client.create(method, controller, action, format,
-                                            path, original_url, request_id, headers,
-                                            params)
+        trace_id, _interval, max_trace_entries = client.create(method, controller, action, format,
+                                                               path, original_url, request_id, headers,
+                                                               params)
 
         puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
 
         create_message(start_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
 
-        trace_id
+        return trace_id, max_trace_entries
       end
 
-      def complete_request(method, controller, action, format, trace_id)
+      def complete_request(method, controller, action, format, trace_id, max_trace_entries)
         create_message(completed_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
-        send_traces!(trace_id, @traces)
+        send_traces!(trace_id, @traces[0..max_trace_entries])
+      end
+
+      def return_value(return_val)
+        return_val.inspect
+      rescue ThreadError
+        # deadlock; recursive locking (ThreadError)
+        # Discourse overrides ActiveSupport::Inflector methods via lib/freedom_patches/inflector_backport.rb
+        # when return_value.inspect is called, it triggers a subsequent call
+        # to the instrumented inflector method, causing another call to mutex#synchronize
+        # from the block of the first synchronize call
+
+        return_val.to_s rescue "****"  # Can't evaluate
       end
 
       def klass_name(klass)
