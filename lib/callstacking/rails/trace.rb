@@ -45,6 +45,7 @@ module Callstacking
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
           complete_request(payload[:method], payload[:controller],
                            payload[:action], payload[:format],
+                           payload[:request]&.original_url,
                            trace_id, max_trace_entries)
         end
       end
@@ -72,7 +73,7 @@ module Callstacking
                       method_name: method_name,
                       return_value: return_value(return_val),
                       coupled_callee: coupled_callee,
-                      message: '',
+                      message: nil,
           }
         end
       end
@@ -87,10 +88,10 @@ module Callstacking
                       line_number: line_no,
                       path: path,
                       method_name: method_name,
-                      return_value: {}.to_s,
+                      return_value: nil,
                       coupled_callee: nil,
                       local_variables: {},
-                      message: '',
+                      message: nil,
           }
         end
       end
@@ -101,13 +102,12 @@ module Callstacking
                       order_num: order_num,
                       nesting_level: 0,
                       message: message,
-
                       args: {},
-                      klass: '',
-                      line_number: '',
-                      path: '',
-                      method_name: '',
-                      return_value: {},
+                      klass: nil,
+                      line_number: nil,
+                      path: nil,
+                      method_name: nil,
+                      return_value: nil,
                       coupled_callee: false,
                       local_variables: {},
           }
@@ -123,6 +123,8 @@ module Callstacking
         end
       end
       def start_request(request_id, method, controller, action, format, path, original_url, headers, params)
+        return if do_not_track_request?(original_url)
+        
         request_id = request_id || SecureRandom.uuid
         Callstacking::Rails::Trace.current_request_id = request_id
 
@@ -138,10 +140,21 @@ module Callstacking
         return trace_id, max_trace_entries
       end
 
-      def complete_request(method, controller, action, format, trace_id, max_trace_entries)
+      def complete_request(method, controller, action, format, original_url, trace_id, max_trace_entries)
+        return if do_not_track_request?(original_url)
+
         create_message(completed_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
+
         send_traces!(trace_id, @traces[0..max_trace_entries])
+      end
+
+      def track_request?(url)
+        !(track_request?(url))
+      end
+
+      def do_not_track_request?(url)
+        url =~ /(\/stylesheets\/|\/javascripts\/|\/css\/|\/js\/|\.js|\.css)/i
       end
 
       def return_value(return_val)
