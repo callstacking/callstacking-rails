@@ -20,6 +20,8 @@ module Callstacking
         # Application level method definitions
         return unless method_path =~ root if application_level
 
+        return if method_path =~ /initializer/i
+
         tmp_module = find_or_initialize_module
 
         return if tmp_module.nil? ||

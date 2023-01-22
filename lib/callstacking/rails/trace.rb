@@ -29,8 +29,9 @@ module Callstacking
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
           trace_id, max_trace_entries = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
-                                                       payload[:action], payload[:format], ::Rails.root,
-                                                       payload[:original_url], payload[:headers], payload[:params])
+                                                      payload[:action], payload[:format], ::Rails.root,
+                                                      payload[:request]&.original_url,
+                                                      payload[:headers], payload[:params])
         end
 
         @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
@@ -60,44 +61,56 @@ module Callstacking
 
       def create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
         lock.synchronize do
-          traces << { trace_entry: { trace_entryable_type: 'TraceCallReturn',
-                                     order_num: order_num,
-                                     nesting_level: nesting_level,
-                                     trace_entryable_attributes: {
-                                       local_variables: {},
-                                       klass: klass_name(klass),
-                                       line_number: line_no,
-                                       path: path,
-                                       method_name: method_name,
-                                       return_value: return_value(return_val),
-                                       coupled_callee: coupled_callee,
-                                     } } }
+          traces << { type: 'TraceCallReturn',
+                      order_num: order_num,
+                      nesting_level: nesting_level,
+                      local_variables: {},
+                      args: {},
+                      klass: klass_name(klass),
+                      line_number: line_no,
+                      path: path,
+                      method_name: method_name,
+                      return_value: return_value(return_val),
+                      coupled_callee: coupled_callee,
+                      message: '',
+          }
         end
       end
 
       def create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
-          traces << { trace_entry: { trace_entryable_type: 'TraceCallEntry',
-                                     order_num: order_num,
-                                     nesting_level: nesting_level,
-                                     trace_entryable_attributes: {
-                                       args: arguments,
-                                       klass: klass_name(klass),
-                                       line_number: line_no,
-                                       path: path,
-                                       method_name: method_name,
-                                     } } }
+          traces << { type: 'TraceCallEntry',
+                      order_num: order_num,
+                      nesting_level: nesting_level,
+                      args: arguments,
+                      klass: klass_name(klass),
+                      line_number: line_no,
+                      path: path,
+                      method_name: method_name,
+                      return_value: {}.to_s,
+                      coupled_callee: nil,
+                      local_variables: {},
+                      message: '',
+          }
         end
       end
 
       def create_message(message, order_num, traces)
         lock.synchronize do
-          traces << { trace_entry: { trace_entryable_type: 'TraceMessage',
-                                     order_num: order_num,
-                                     nesting_level: 0,
-                                     trace_entryable_attributes: {
-                                       message: message
-                                     } } }
+          traces << { type: 'TraceMessage',
+                      order_num: order_num,
+                      nesting_level: 0,
+                      message: message,
+
+                      args: {},
+                      klass: '',
+                      line_number: '',
+                      path: '',
+                      method_name: '',
+                      return_value: {},
+                      coupled_callee: false,
+                      local_variables: {},
+          }
         end
       end
 
@@ -105,7 +118,7 @@ module Callstacking
         lock.synchronize do
           return if traces.empty?
 
-          client.upsert(trace_id, { traces: traces })
+          client.upsert(trace_id, { trace_entries: traces })
           traces.clear
         end
       end
