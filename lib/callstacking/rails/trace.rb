@@ -141,7 +141,10 @@ module Callstacking
       end
 
       def complete_request(method, controller, action, format, original_url, trace_id, max_trace_entries)
-        return if do_not_track_request?(original_url)
+        if do_not_track_request?(original_url)
+          traces.clear
+          return
+        end
 
         create_message(completed_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
