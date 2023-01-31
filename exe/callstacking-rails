@@ -17,7 +17,7 @@ read_settings
 
 case action
   when 'register'
-    `open #{settings.url || Callstacking::Rails::Settings::PRODUCTION_URL}/users/sign_up`
+    `open #{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/users/sign_up`
 
   when 'setup'
     Callstacking::Rails::Setup.new.start

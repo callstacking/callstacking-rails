@@ -88,14 +88,6 @@ module Callstacking
         puts
         puts "Usage: "
         puts
-        puts "  > callstacking-rails enable"
-        puts
-        puts "    Enables the callstacking tracing."
-        puts
-        puts "  > callstacking-rails disable"
-        puts
-        puts "    Disables the callstacking tracing."
-        puts
         puts "  > callstacking-rails register"
         puts
         puts "    Opens a browser window to register as a callstacking.com user."
@@ -104,6 +96,14 @@ module Callstacking
         puts
         puts "    Interactively prompts you for your callstacking.com username/password."
         puts "    Stores auth details in #{SETTINGS_FILE}"
+        puts
+        puts "  > callstacking-rails enable"
+        puts
+        puts "    Enables the callstacking tracing."
+        puts
+        puts "  > callstacking-rails disable"
+        puts
+        puts "    Disables the callstacking tracing."
         puts
         puts " You can have multiple environments."
         puts " The default is #{Callstacking::Rails::Env::DEFAULT_ENVIRONMENT}."
