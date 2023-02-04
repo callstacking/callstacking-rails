@@ -2,6 +2,7 @@ require 'yaml'
 require "callstacking/rails/settings"
 require "callstacking/rails/client/authenticate"
 require "callstacking/rails/env"
+require 'io/console'
 
 module Callstacking
   module Rails
@@ -24,7 +25,7 @@ module Callstacking
         puts
         
         email      = prompt("Enter email:")
-        password   = prompt("Enter password:")
+        password   = prompt("Enter password:", echo: false)
 
         url = if Callstacking::Rails::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
                 PRODUCTION_URL
@@ -50,9 +51,14 @@ module Callstacking
         write_settings(complete_settings.merge(props))
       end
 
-      def prompt(label)
+      def prompt(label, echo: true)
         puts label
-        value = STDIN.gets.chomp
+
+        value = if echo
+                  STDIN.gets.chomp
+                else
+                  STDIN.noecho(&:gets).chomp
+                end
         puts
 
         return nil if value == ''

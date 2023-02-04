@@ -28,25 +28,52 @@ module Callstacking
                     tmp_module.instance_methods.include?(method_name) ||
                     tmp_module.singleton_methods.include?(method_name)
 
-        tmp_module.define_method(method_name) do |*args, **kwargs, &block|
-          method_name = __method__
+        new_method = nil
+        if RUBY_VERSION < "2.7.0"
+          new_method = tmp_module.define_method(method_name) do |*args, &block|
+            method_name = __method__
 
-          path = method(__method__).super_method.source_location.first
-          line_no = method(__method__).super_method.source_location.last
+            path = method(__method__).super_method.source_location.first
+            line_no = method(__method__).super_method.source_location.last
 
-          p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
+            p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
-          spans = tmp_module.instance_variable_get(:@spans)
-          klass = tmp_module.instance_variable_get(:@klass)
+            spans = tmp_module.instance_variable_get(:@spans)
+            klass = tmp_module.instance_variable_get(:@klass)
 
-          arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
+            arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
-          spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
-          return_val = super(*args, **kwargs, &block)
-          spans.call_return(klass, method_name, p || path, l || line_no, return_val)
+            spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            return_val = super(*args, &block)
+            spans.call_return(klass, method_name, p || path, l || line_no, return_val)
 
-          return_val
+            return_val
+          end
+          new_method.ruby2_keywords if new_method.respond_to?(:ruby2_keywords)
+        else
+          new_method = tmp_module.define_method(method_name) do |*args, **kwargs, &block|
+            method_name = __method__
+
+            path = method(__method__).super_method.source_location.first
+            line_no = method(__method__).super_method.source_location.last
+
+            p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
+
+            spans = tmp_module.instance_variable_get(:@spans)
+            klass = tmp_module.instance_variable_get(:@klass)
+
+            arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
+
+            spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            return_val = super(*args, **kwargs, &block)
+            spans.call_return(klass, method_name, p || path, l || line_no, return_val)
+
+            return_val
+          end
+
         end
+
+        new_method
       end
 
       def find_or_initialize_module

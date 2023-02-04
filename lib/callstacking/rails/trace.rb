@@ -46,7 +46,7 @@ module Callstacking
           complete_request(payload[:method], payload[:controller],
                            payload[:action], payload[:format],
                            payload[:request]&.original_url,
-                           trace_id, max_trace_entries)
+                           trace_id, @traces, max_trace_entries)
         end
       end
 
@@ -140,16 +140,16 @@ module Callstacking
         return trace_id, max_trace_entries
       end
 
-      def complete_request(method, controller, action, format, original_url, trace_id, max_trace_entries)
+      def complete_request(method, controller, action, format, original_url, trace_id, traces, max_trace_entries)
         if do_not_track_request?(original_url)
           traces.clear
           return
         end
 
         create_message(completed_request_message(method, controller, action, format),
-                       spans.increment_order_num, @traces)
+                       spans.increment_order_num, traces)
 
-        send_traces!(trace_id, @traces[0..max_trace_entries])
+        send_traces!(trace_id, traces[0..max_trace_entries])
       end
 
       def track_request?(url)
