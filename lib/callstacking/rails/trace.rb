@@ -30,7 +30,7 @@ module Callstacking
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
           trace_id, max_trace_entries = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
                                                       payload[:action], payload[:format], ::Rails.root,
-                                                      payload[:request]&.original_url,
+                                                      payload[:request]&.original_url || payload[:path],
                                                       payload[:headers], payload[:params])
         end
 
@@ -45,7 +45,7 @@ module Callstacking
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
           complete_request(payload[:method], payload[:controller],
                            payload[:action], payload[:format],
-                           payload[:request]&.original_url,
+                           payload[:request]&.original_url || payload[:path],
                            trace_id, @traces, max_trace_entries)
         end
       end
@@ -123,7 +123,7 @@ module Callstacking
         end
       end
       def start_request(request_id, method, controller, action, format, path, original_url, headers, params)
-        return if do_not_track_request?(original_url)
+        return if do_not_track_request?(original_url, format)
         
         request_id = request_id || SecureRandom.uuid
         Callstacking::Rails::Trace.current_request_id = request_id
@@ -141,7 +141,7 @@ module Callstacking
       end
 
       def complete_request(method, controller, action, format, original_url, trace_id, traces, max_trace_entries)
-        if do_not_track_request?(original_url)
+        if do_not_track_request?(original_url, format)
           traces.clear
           return
         end
@@ -156,7 +156,9 @@ module Callstacking
         !(track_request?(url))
       end
 
-      def do_not_track_request?(url)
+      def do_not_track_request?(url, format)
+        return false if format =~ /(html|json)/i
+        
         url =~ /(\/stylesheets\/|\/javascripts\/|\/css\/|\/js\/|\.js|\.css)/i
       end
 
