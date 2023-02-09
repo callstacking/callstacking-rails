@@ -41,7 +41,7 @@ module Callstacking
       end
 
       def read_settings
-        @@settings = @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings)
+        @@settings = @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings) || {}
       rescue StandardError => e
         puts e.full_message
         puts e.backtrace.join("\n")
