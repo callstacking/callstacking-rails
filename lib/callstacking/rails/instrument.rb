@@ -29,7 +29,7 @@ module Callstacking
                     tmp_module.singleton_methods.include?(method_name)
 
         new_method = nil
-        if RUBY_VERSION < "2.7.0"
+        if RUBY_VERSION < "2.7.8"
           new_method = tmp_module.define_method(method_name) do |*args, &block|
             method_name = __method__
 
