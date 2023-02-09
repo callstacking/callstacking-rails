@@ -32,6 +32,7 @@ module Callstacking
 
       def enabled?
         return false if settings.nil?
+        return false if ENV['CALLSTACKING_ENABLED'] == 'false'
         settings[:enabled]
       end
 
