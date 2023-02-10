@@ -1,4 +1,4 @@
-require "action_view/helpers/tag_helper"
+require 'action_view/helpers'
 require "action_view/context.rb"
 
 module Callstacking
