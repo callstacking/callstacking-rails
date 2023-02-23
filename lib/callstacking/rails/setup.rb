@@ -27,18 +27,15 @@ module Callstacking
         email      = prompt("Enter email:")
         password   = prompt("Enter password:", echo: false)
 
-        url = if Callstacking::Rails::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
-                PRODUCTION_URL
-              else
-                prompt("Enter URL for #{Callstacking::Rails::Env.environment} API calls [#{PRODUCTION_URL}]:") || PRODUCTION_URL
-              end
-
         save(email, password, url)
 
         puts "Authentication successful."
         puts "Settings saved to #{SETTINGS_FILE}"
+        true
       rescue StandardError => e
         puts "Problem authenticating: #{e.message}"
+        puts e.backtrace.join("\n")
+        false
       end
 
       def enable_disable(enabled: true)
@@ -54,11 +51,7 @@ module Callstacking
       def prompt(label, echo: true)
         puts label
 
-        value = if echo
-                  STDIN.gets.chomp
-                else
-                  STDIN.noecho(&:gets).chomp
-                end
+        value = echo ? STDIN.gets.chomp : STDIN.noecho(&:gets).chomp
         puts
 
         return nil if value == ''
@@ -118,6 +111,16 @@ module Callstacking
         puts " By setting the RAILS_ENV environment you can maintain multiple settings."
         puts
         puts "Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues"
+      end
+
+      private
+
+      def url
+        if Callstacking::Rails::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
+          PRODUCTION_URL
+        else
+          prompt("Enter URL for #{Callstacking::Rails::Env.environment} API calls [#{PRODUCTION_URL}]:") || PRODUCTION_URL
+        end
       end
     end
   end

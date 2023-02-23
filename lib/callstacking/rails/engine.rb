@@ -13,13 +13,15 @@ require "callstacking/rails/traces_helper"
 module Callstacking
   module Rails
     class Engine < ::Rails::Engine
+      cattr_accessor :spans, :trace
+
       include Settings
       isolate_namespace Callstacking::Rails
 
       read_settings
 
-      spans = Spans.new
-      trace = Trace.new(spans)
+      @@spans||=Spans.new
+      @@trace||=Trace.new(@@spans)
 
       initializer "engine_name.assets.precompile" do |app|
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
@@ -30,7 +32,7 @@ module Callstacking
           include Callstacking::Rails::TracesHelper
         end
 
-        Callstacking::Rails::Loader.new.on_load(spans) if enabled?
+        Callstacking::Rails::Loader.new.on_load(@@spans) if enabled?
       end
 
       initializer :append_before_action do
