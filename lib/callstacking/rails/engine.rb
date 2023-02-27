@@ -40,10 +40,10 @@ module Callstacking
       end
 
       if enabled?
-        puts "Callstacking enabled (#{Callstacking::Rails::Env.environment})"
+        puts "Call Stacking enabled (#{Callstacking::Rails::Env.environment})"
         trace.tracing
       else
-        puts "Callstacking disabled (#{Callstacking::Rails::Env.environment})"
+        puts "Call Stacking disabled (#{Callstacking::Rails::Env.environment})"
       end
     end
   end

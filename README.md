@@ -1,6 +1,6 @@
 # Callstacking::Rails
 
-Callstacking is a rolling, checkpoint debugger for Rails.  It records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).  
+Call Stacking is a rolling, checkpoint debugger for Rails.  It records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).  
 
 You no longer need to debug with `binding.pry` or `puts` statements, as the entire callstack for a given request is captured.
 
@@ -17,13 +17,13 @@ For method returns ↳, the final values of the local variables will be listed w
 
 Subsequent calls within a method are visibly nested.
 
-Callstacking is a Rails engine that you mount within your Rails app.
+Call Stacking is a Rails engine that you mount within your Rails app.
 
 Here's a sample debugging sessions recorded from a Jumpstart Rails based app I've been working on.  This is a request for the main page ( https://smartk.id/ ).
 
 ![image](https://user-images.githubusercontent.com/4600/190882432-58092e38-7ee2-4138-b13a-f45ff2b09227.png)
 
-Callstacking Rails records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).
+Call Stacking Rails records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).
 
 All in a rolling panel, so that you can debug your call chains from any point in the stack.
 
@@ -43,7 +43,7 @@ And then execute:
 $ bundle
 ```
    
-Register an account at Callstacking.com
+Register an account at callstacking.com
 ```bash
 callstacking-rails register
 ```

@@ -24,9 +24,9 @@ case action
 
   when 'enable'
     Callstacking::Rails::Setup.new.enable_disable
-    puts "Callstacking tracing enabled (#{Callstacking::Rails::Env.environment})"
+    puts "Call Stacking tracing enabled (#{Callstacking::Rails::Env.environment})"
 
   when 'disable'
     Callstacking::Rails::Setup.new.enable_disable(enabled: false)
-    puts "Callstacking tracing disabled (#{Callstacking::Rails::Env.environment})"
+    puts "Call Stacking tracing disabled (#{Callstacking::Rails::Env.environment})"
 end

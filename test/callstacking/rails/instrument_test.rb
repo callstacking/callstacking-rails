@@ -5,32 +5,18 @@ require 'minitest/autorun'
 module Callstacking
   module Rails
     class InstrumentTest < Minitest::Test
-      class Salutation
-        def hello(name)
-          "hello #{name}"
-        end
-
-        def self.hello(name)
-          "hi #{name}"
-        end
-
-        def hi(first_name, last_name:)
-          "hi #{first_name} #{last_name}"
-        end
-
-        def self.hi(first_name:, last_name:)
-          "hi #{first_name} #{last_name}"
-        end
-      end
-      
       def setup
         @spans = Callstacking::Rails::Spans.new
         @subject = Callstacking::Rails::Instrument.new(@spans, Salutation)
       end
 
       def test_instrument_klass
+        assert_match /app\/models\/salutation\.rb/, Salutation.instance_method(:hello).source_location.first
+
         @subject.instrument_klass(application_level: false)
-        assert_equal true, Salutation.ancestors.include?(CallstackingRailsInstrumentTestSalutationSpan)
+
+        assert_equal true, Salutation.ancestors.include?(SalutationSpan)
+        assert_match /instrument.rb/, Salutation.instance_method(:hello).source_location.first
       end
     end
   end
