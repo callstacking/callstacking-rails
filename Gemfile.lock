@@ -74,8 +74,26 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    async (2.4.0)
+      console (~> 1.10)
+      io-event (~> 1.1)
+      timers (~> 4.1)
+    async-http (0.60.1)
+      async (>= 1.25)
+      async-io (>= 1.28)
+      async-pool (>= 0.2)
+      protocol-http (~> 0.24.0)
+      protocol-http1 (~> 0.15.0)
+      protocol-http2 (~> 0.15.0)
+      traces (>= 0.8.0)
+    async-io (1.34.3)
+      async
+    async-pool (0.3.12)
+      async (>= 1.25)
     builder (3.2.4)
     concurrent-ruby (1.1.10)
+    console (1.16.2)
+      fiber-local
     crass (1.0.6)
     date (3.3.3)
     erubi (1.11.0)
@@ -85,10 +103,12 @@ GEM
     faraday-follow_redirects (0.3.0)
       faraday (>= 1, < 3)
     faraday-net_http (3.0.2)
+    fiber-local (1.0.0)
     globalid (1.1.0)
       activesupport (>= 5.0)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    io-event (1.1.6)
     loofah (2.18.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -113,6 +133,15 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.13.8-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-linux)
+      racc (~> 1.4)
+    protocol-hpack (1.4.2)
+    protocol-http (0.24.1)
+    protocol-http1 (0.15.0)
+      protocol-http (~> 0.22)
+    protocol-http2 (0.15.1)
+      protocol-hpack (~> 1.4)
+      protocol-http (~> 0.18)
     racc (1.6.0)
     rack (2.2.4)
     rack-test (2.0.2)
@@ -155,6 +184,8 @@ GEM
     sqlite3 (1.4.4)
     thor (1.2.1)
     timeout (0.3.1)
+    timers (4.3.5)
+    traces (0.8.0)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     websocket-driver (0.7.5)
@@ -164,8 +195,10 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
+  async-http (~> 0.60.1)
   callstacking-rails!
   sprockets-rails
   sqlite3
