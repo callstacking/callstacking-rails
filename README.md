@@ -85,15 +85,23 @@ By setting the RAILS_ENV environment you can maintain multiple settings.
 
 Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues
 
+## Environment
+
+You can provide the auth token via the `CALLSTACKING_AUTH_TOKEN` environment variable.
+
+Your API token values can be viewed at https://callstacking.com/api_tokens
+
+You can enable/disable tracing via the `CALLSTACKING_ENABLED` environment variable (false|true).
 
 ## Trace Output
-When you open a page for your app, once the page has rendered, you will see an `<<` arrow on the right hand side.
+When you open a page for your app, once the page has rendered, you will see a `💥` icon on the right hand side.
 
-Click the arrows, and observe the full callstack context.
+Click the icon and observe the full callstack context.
 
 ## Tests
 ``
 rake app:test:all
 ``
+
 ## License
 The gem is available as open source under the terms of the [GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.en.html).

@@ -15,11 +15,11 @@ module Callstacking
       PRODUCTION_URL = "https://callstacking.com"
 
       def url
-        settings[:url]
+        settings[:url] || PRODUCTION_URL
       end
 
       def auth_token
-        settings[:auth_token]
+        ENV['CALLSTACKING_API_TOKEN'] || settings[:auth_token]
       end
 
       def auth_token?

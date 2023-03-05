@@ -116,7 +116,7 @@ module Callstacking
       private
 
       def url
-        if Callstacking::Rails::Env.production? && ENV['CHECKPOINT_RAILS_LOCAL_TEST'].nil?
+        if Callstacking::Rails::Env.production? && ENV['CALLSTACKING_RAILS_LOCAL_TEST'].nil?
           PRODUCTION_URL
         else
           prompt("Enter URL for #{Callstacking::Rails::Env.environment} API calls [#{PRODUCTION_URL}]:") || PRODUCTION_URL

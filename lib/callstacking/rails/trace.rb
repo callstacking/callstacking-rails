@@ -132,12 +132,22 @@ module Callstacking
                                                                path, original_url, request_id, headers,
                                                                params)
 
-        puts "#{settings[:url] || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{trace_id}"
+        print_trace_url(trace_id)
 
         create_message(start_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
 
         return trace_id, max_trace_entries
+      end
+
+      def print_trace_url(trace_id)
+        url = "#{settings[:url]}/traces/#{trace_id}"
+        
+        puts "*" * url.size
+        puts url
+        puts "*" * url.size
+
+        url
       end
 
       def complete_request(method, controller, action, format, original_url, trace_id, traces, max_trace_entries)
@@ -157,9 +167,9 @@ module Callstacking
       end
 
       def do_not_track_request?(url, format)
-        return false if format =~ /(html|json)/i
-        
-        url =~ /(\/stylesheets\/|\/javascripts\/|\/css\/|\/js\/|\.js|\.css)/i
+        return true if format == "*/*"
+
+        (url =~ /(\/assets\/|\/stylesheets\/|\/javascripts\/|\/css\/|\/js\/|\.js|\.css)/i).present?
       end
 
       def return_value(return_val)
