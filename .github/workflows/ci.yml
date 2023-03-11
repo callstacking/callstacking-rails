@@ -1,0 +1,48 @@
+# https://github.com/scenic-views/scenic/blob/main/.github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: "*"
+
+jobs:
+  build:
+    name: Ruby ${{ matrix.ruby }}, Rails ${{ matrix.rails }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["2.7", "3.0", "3.1", "3.2"]
+        rails: ["6.1", "7.0"]
+        continue-on-error: [false]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Generate lockfile
+        run: bundle lock
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor/bundle
+          key: bundle-${{ hashFiles('Gemfile.lock') }}
+
+      - name: Set up Call Stacking client
+        run: bin/setup
+
+      - name: Run tests
+        run: bundle exec rake app:test:all
+        continue-on-error: ${{ matrix.continue-on-error }}
+        
