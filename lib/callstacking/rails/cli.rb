@@ -25,24 +25,24 @@ module Callstacking
 
       def parse_options
         case action
-        when 'register'
+        when REGISTER
           puts "Open the following URL to register:\n\n"
           puts "  #{settings.url}/users/sign_up\n\n"
-          :register
+          REGISTER
 
-        when 'setup'
+        when SETUP
           Callstacking::Rails::Setup.new.start
-          :setup
+          SETUP
 
-        when 'enable'
+        when ENABLE
           settings.enable_disable
           puts "Call Stacking tracing enabled (#{Callstacking::Rails::Env.environment})"
-          :enable
+          ENABLE
 
-        when 'disable'
+        when DISABLE
           settings.enable_disable(enabled: false)
           puts "Call Stacking tracing disabled (#{Callstacking::Rails::Env.environment})"
-          :disable
+          DISABLE
         end
       end
     end

@@ -23,7 +23,7 @@ module Callstacking
         puts "Settings saved to #{Callstacking::Rails::Settings::SETTINGS_FILE}"
         true
       rescue StandardError => e
-        puts "Problem authenticating: #{e.message}"
+        puts "Error authenticating: #{e.message}"
         puts e.backtrace.join("\n")
         false
       end

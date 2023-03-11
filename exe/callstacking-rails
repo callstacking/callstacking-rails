@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
-require "callstacking/rails/setup"
-require "callstacking/rails/settings"
+require "callstacking/rails"
 
-settings = Callstacking::Rails::Settings.new
 action = Callstacking::Rails::Cli.action(ARGV)
+settings = Callstacking::Rails::Settings.new
 
 if action.nil?
   Callstacking::Rails::Setup.instructions

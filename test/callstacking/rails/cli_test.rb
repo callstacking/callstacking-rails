@@ -13,22 +13,22 @@ module Callstacking
       
       def test_register
         @subject = Callstacking::Rails::Cli.new(Callstacking::Rails::Cli::REGISTER, @settings)
-        assert_equal @subject.run, :register
+        assert_equal @subject.run, Callstacking::Rails::Cli::REGISTER
       end
 
       def test_setup
         @subject = Callstacking::Rails::Cli.new(Callstacking::Rails::Cli::SETUP, @settings)
-        assert_equal @subject.run, :setup
+        assert_equal @subject.run, Callstacking::Rails::Cli::SETUP
       end
 
       def test_enable
         @subject = Callstacking::Rails::Cli.new(Callstacking::Rails::Cli::ENABLE, @settings)
-        assert_equal @subject.run, :enable
+        assert_equal @subject.run, Callstacking::Rails::Cli::ENABLE
       end
       
       def test_disable
         @subject = Callstacking::Rails::Cli.new(Callstacking::Rails::Cli::DISABLE, @settings)
-        assert_equal @subject.run, :disable
+        assert_equal @subject.run, Callstacking::Rails::Cli::DISABLE
       end
     end
   end

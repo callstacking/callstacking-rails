@@ -1,4 +1,4 @@
-require "rails/all"
+require "rails"
 require "active_support/cache"
 require "callstacking/rails/env"
 require "callstacking/rails/trace"
