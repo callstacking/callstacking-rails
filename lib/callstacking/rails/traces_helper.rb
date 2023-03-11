@@ -7,11 +7,8 @@ module Callstacking
       include ActionView::Helpers::TagHelper
       include ActionView::Helpers::JavaScriptHelper
       include ActionView::Context
-      include Callstacking::Rails::Settings
 
       def hud
-        read_settings
-
         frame_url = "#{url || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{Callstacking::Rails::Trace.current_request_id}/print"
 
         body = []
@@ -46,8 +43,8 @@ module Callstacking
       end
 
       def inject_hud
-        read_settings
-        return unless enabled?
+        settings = Callstacking::Rails::Settings.new
+        return unless settings.enabled?
         
         response.body = response.body.sub(/<\/body>/i, "#{hud}</body>")
       end

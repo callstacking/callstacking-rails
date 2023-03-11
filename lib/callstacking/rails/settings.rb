@@ -1,18 +1,22 @@
+require "active_support/cache"
 require "active_support/concern"
 require "active_support/core_ext/class/attribute_accessors"
-require "callstacking/rails/env"
 
 module Callstacking
   module Rails
-    module Settings
-      extend ActiveSupport::Concern
-
-      included do |base|
-        attr_accessor :settings
-      end
+    class Settings
+      attr_accessor :settings
+      attr_reader :client
 
       SETTINGS_FILE = "#{Dir.home}/.callstacking"
       PRODUCTION_URL = "https://callstacking.com"
+      ENV_KEY        = 'CALLSTACKING_ENABLED'
+      CACHE_KEY      = :callstacking_enabled
+
+      def initialize
+        read_settings
+        @client = Callstacking::Rails::Client::Authenticate.new(url, auth_token)
+      end
 
       def url
         settings[:url] || PRODUCTION_URL
@@ -30,9 +34,19 @@ module Callstacking
         File.write(SETTINGS_FILE, new_settings.to_yaml)
       end
 
+      def enable!
+        ::Rails.cache.write(CACHE_KEY, true)
+      end
+
+      def disable!
+        ::Rails.cache.write(CACHE_KEY, false)
+      end
+
       def enabled?
+        return ::Rails.cache.read(CACHE_KEY) unless ::Rails.cache.read(CACHE_KEY).nil?
+        return false if ENV[ENV_KEY] == 'false'
         return false if settings.nil?
-        return false if ENV['CALLSTACKING_ENABLED'] == 'false'
+        
         settings[:enabled]
       end
 
@@ -40,8 +54,43 @@ module Callstacking
         !enabled?
       end
 
+      def save(email, password, url)
+        props = { auth_token: '',
+                  url: url,
+                  enabled: true
+        }
+
+        props = { Callstacking::Rails::Env.environment => {
+          settings: props
+        } }
+
+        write_settings(complete_settings.merge(props))
+
+        props[Callstacking::Rails::Env.environment][:settings][:auth_token] = token(email, password)
+
+        write_settings(complete_settings.merge(props))
+
+        read_settings
+      end
+
+      def enable_disable(enabled: true)
+        settings[:enabled] = enabled
+
+        props = { Callstacking::Rails::Env.environment => {
+          settings: settings
+        } }
+
+        write_settings(complete_settings.merge(props))
+      end
+
+      private
+
+      def token(email, password)
+        client.login(email, password)
+      end
+
       def read_settings
-        @@settings = @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings) || {}
+        @settings = complete_settings.dig(::Callstacking::Rails::Env.environment, :settings) || {}
       rescue StandardError => e
         puts e.full_message
         puts e.backtrace.join("\n")

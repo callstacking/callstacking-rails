@@ -4,30 +4,13 @@ require "bundler/setup"
 require "callstacking/rails/setup"
 require "callstacking/rails/settings"
 
-include Callstacking::Rails::Settings
-
-action = ARGV[0]&.downcase&.strip
+settings = Callstacking::Rails::Settings.new
+action = Callstacking::Rails::Cli.action(ARGV)
 
 if action.nil?
   Callstacking::Rails::Setup.instructions
   exit!(1)
 end
 
-read_settings
-
-case action
-  when 'register'
-    puts "Open the following URL to register:\n\n"
-    puts "  #{settings[:url]}/users/sign_up\n\n"
-
-  when 'setup'
-    Callstacking::Rails::Setup.new.start
-
-  when 'enable'
-    Callstacking::Rails::Setup.new.enable_disable
-    puts "Call Stacking tracing enabled (#{Callstacking::Rails::Env.environment})"
-
-  when 'disable'
-    Callstacking::Rails::Setup.new.enable_disable(enabled: false)
-    puts "Call Stacking tracing disabled (#{Callstacking::Rails::Env.environment})"
-end
+cli = Callstacking::Rails::Cli.new(action, settings)
+cli.run

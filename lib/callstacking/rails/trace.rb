@@ -1,29 +1,23 @@
 require "rails"
 require "active_support/concern"
-require "callstacking/rails/client/base"
-require "callstacking/rails/client/authenticate"
-require "callstacking/rails/client/trace"
-require "callstacking/rails/settings"
 
 module Callstacking
   module Rails
     class Trace
-      include Callstacking::Rails::Settings
-
       attr_accessor :spans, :client, :lock
+      attr_reader :settings
       cattr_accessor :current_request_id
 
       def initialize(spans)
         @traces = []
         @spans  = spans
+        @settings = Callstacking::Rails::Settings.new
 
         @lock   = Mutex.new
-        @client = Callstacking::Rails::Client::Trace.new
+        @client = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
       end
 
       def tracing
-        read_settings
-
         trace_id = nil
         max_trace_entries = nil
 
@@ -141,7 +135,7 @@ module Callstacking
       end
 
       def print_trace_url(trace_id)
-        url = "#{settings[:url]}/traces/#{trace_id}"
+        url = "#{settings.url}/traces/#{trace_id}"
         
         puts "*" * url.size
         puts url

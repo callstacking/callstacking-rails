@@ -8,18 +8,16 @@ module Callstacking
     class SetupTest < Minitest::Test
       def setup
         @subject = Callstacking::Rails::Setup.new
+        Callstacking::Rails::Settings.any_instance.stubs(:save).returns(true)
       end
 
       def test_start
-        def @subject.prompt(*_args)
-          'test-value'
-        end
-
-        def @subject.token(*_args)
-          'auth-token'
-        end
+        @subject.stubs(:prompt).returns('value')
 
         assert_equal true, @subject.start
+      end
+      def test_instructions
+        assert_equal :instructions, Callstacking::Rails::Setup.instructions
       end
     end
   end
