@@ -1,4 +1,5 @@
 # Callstacking::Rails
+[![Build Status](https://github.com/callstacking/callstacking-rails/actions/workflows/ci.yml/badge.svg)](https://github.com/callstacking/callstacking-rails/actions/workflows/ci.yml)
 
 Call Stacking is a rolling, checkpoint debugger for Rails.  It records all of the critical method calls within your app, along with their important context (param/argument/return/local variable values).  
 
