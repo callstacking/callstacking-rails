@@ -32,18 +32,19 @@ module Callstacking
         ActiveSupport.on_load :action_controller do
           include Callstacking::Rails::TracesHelper
         end
-
-        Callstacking::Rails::Loader.new.on_load(@@spans) if settings.enabled?
-      end
-
-      initializer :append_before_action do
-        ActionController::Base.send :after_action, :inject_hud, if: -> { settings.enabled? }
       end
 
       config.after_initialize do
-        if settings.enabled?
+        if @@settings.enabled?
           puts "Call Stacking enabled (#{Callstacking::Rails::Env.environment})"
-          trace.tracing
+
+          ActionController::Base.send :after_action do
+            inject_hud(@@settings)
+          end
+
+          Callstacking::Rails::Loader.new.on_load(@@spans)
+
+          @@trace.tracing
         else
           puts "Call Stacking disabled (#{Callstacking::Rails::Env.environment})"
         end
