@@ -1,0 +1,15 @@
+Hello
+
+::Rails.cache.read(CACHE_KEY): <%= ::Rails.cache.read(Callstacking::Rails::Settings::CACHE_KEY) %>
+<hr/>
+ENV[ENV_KEY]: <%= ENV[Callstacking::Rails::Settings::ENV_KEY] %>
+<hr/>
+settings.nil?: <%= @settings.settings.nil? %>
+<hr/>
+Rails env: <%= Rails.env.to_s %>
+<hr/>
+Callstacking env: <%= Callstacking::Rails::Env.environment %>
+<hr/>
+Settings: <%= @settings.settings %>
+<hr/>
+Enabled: <%= @settings.enabled? %>

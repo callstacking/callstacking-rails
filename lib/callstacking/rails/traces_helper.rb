@@ -7,11 +7,8 @@ module Callstacking
       include ActionView::Helpers::TagHelper
       include ActionView::Helpers::JavaScriptHelper
       include ActionView::Context
-      include Callstacking::Rails::Settings
 
-      def hud
-        read_settings
-
+      def hud(url)
         frame_url = "#{url || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{Callstacking::Rails::Trace.current_request_id}/print"
 
         body = []
@@ -20,7 +17,7 @@ module Callstacking
                             padding: 0px; position: fixed; height: 50px; width: 40px; cursor: pointer;',
                     onclick: 'document.getElementById("callstacking-debugger").style.display = "unset";
                               document.getElementById("callstacking-close").style.display = "unset";') do
-          "<span title='ctrl-d'><center>💥</center></span>".html_safe
+          "<span title='ctrl-d'><center>#{Callstacking::Rails::Trace::ICON}</center></span>".html_safe
         end)
         
         body << (content_tag(:iframe, src: frame_url, id: 'callstacking-debugger', data: { turbo:false },
@@ -45,11 +42,8 @@ module Callstacking
         body.join
       end
 
-      def inject_hud
-        read_settings
-        return unless enabled?
-        
-        response.body = response.body.sub(/<\/body>/i, "#{hud}</body>")
+      def inject_hud(settings)
+        response.body = response.body.sub(/<\/body>/i, "#{hud(settings.url)}</body>")
       end
     end
   end

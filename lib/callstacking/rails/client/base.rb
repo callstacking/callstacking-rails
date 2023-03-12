@@ -1,6 +1,5 @@
 require 'faraday'
 require 'faraday/follow_redirects'
-require "callstacking/rails/settings"
 
 module Callstacking
   module Rails
@@ -8,12 +7,12 @@ module Callstacking
       class Error < StandardError; end
 
       class Base
-        include Callstacking::Rails::Settings
+        attr_reader :url, :auth_token
 
-        def initialize
-          read_settings
+        def initialize(url, auth_token)
+          @url = url
+          @auth_token = auth_token
         end
-
         def connection
           # https://github.com/lostisland/awesome-faraday
           @connection ||= Faraday.new(url) do |c|
@@ -25,7 +24,7 @@ module Callstacking
             c.request :json # This will set the "Content-Type" header to application/json and call .to_json on the body
             c.adapter Faraday.default_adapter
 
-            if auth_token?
+            if auth_token.present?
               c.request :authorization, :Bearer, auth_token
             end
           end

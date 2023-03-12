@@ -1,6 +1,20 @@
 # Configure Rails Environment
+require 'callstacking/rails/settings'
+require 'callstacking/rails/env'
+require 'callstacking/rails/client/base'
+require 'callstacking/rails/client/authenticate'
+
 ENV["RAILS_ENV"] = "test"
-ENV['CALLSTACKING_ENABLED'] = 'false'
+
+# https://github.com/Shopify/minitest-silence
+ENV["CI"] = "true"
+
+Callstacking::Rails::Settings.new.save('test@test.com',
+                                       'testing123',
+                                       Callstacking::Rails::Settings::PRODUCTION_URL)
+
+ENV[Callstacking::Rails::Settings::ENV_KEY] = 'true'
+
 
 require_relative "../test/dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths = [File.expand_path("../test/dummy/db/migrate", __dir__)]
@@ -14,3 +28,5 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.file_fixture_path = ActiveSupport::TestCase.fixture_path + "/files"
   ActiveSupport::TestCase.fixtures :all
 end
+
+require 'mocha/minitest'
