@@ -8,6 +8,8 @@ module Callstacking
       attr_reader :settings
       cattr_accessor :current_request_id
 
+      ICON = '💥'
+
       def initialize(spans)
         @traces = []
         @spans  = spans

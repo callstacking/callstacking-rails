@@ -17,7 +17,7 @@ module Callstacking
                             padding: 0px; position: fixed; height: 50px; width: 40px; cursor: pointer;',
                     onclick: 'document.getElementById("callstacking-debugger").style.display = "unset";
                               document.getElementById("callstacking-close").style.display = "unset";') do
-          "<span title='ctrl-d'><center>💥</center></span>".html_safe
+          "<span title='ctrl-d'><center>#{Callstacking::Rails::Trace::ICON}</center></span>".html_safe
         end)
         
         body << (content_tag(:iframe, src: frame_url, id: 'callstacking-debugger', data: { turbo:false },
