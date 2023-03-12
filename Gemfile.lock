@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    callstacking-rails (0.1.18)
+    callstacking-rails (0.1.19)
       async
       faraday (>= 1.10.3)
       faraday-follow_redirects
@@ -184,7 +184,7 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.4.4)
     thor (1.2.1)
-    timeout (0.3.1)
+    timeout (0.3.2)
     timers (4.3.5)
     traces (0.8.0)
     tzinfo (2.0.5)
@@ -192,7 +192,7 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.6.6)
+    zeitwerk (2.6.7)
 
 PLATFORMS
   arm64-darwin-21
