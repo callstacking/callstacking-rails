@@ -34,11 +34,11 @@ module Callstacking
         File.write(SETTINGS_FILE, new_settings.to_yaml)
       end
 
-      def enable!
+      def self.enable!
         ::Rails.cache.write(CACHE_KEY, true)
       end
 
-      def disable!
+      def self.disable!
         ::Rails.cache.write(CACHE_KEY, false)
       end
 

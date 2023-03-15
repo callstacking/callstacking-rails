@@ -17,6 +17,14 @@ module Callstacking
 
         @lock   = Mutex.new
         @client = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
+
+        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
+          create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
+        end
+
+        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
+          create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces)
+        end
       end
 
       def tracing
@@ -28,14 +36,6 @@ module Callstacking
                                                       payload[:action], payload[:format], ::Rails.root,
                                                       payload[:request]&.original_url || payload[:path],
                                                       payload[:headers], payload[:params])
-        end
-
-        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
-          create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
-        end
-
-        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
-          create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces)
         end
 
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|

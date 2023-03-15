@@ -5,11 +5,12 @@ module Callstacking
   module Rails
     class Instrument
       attr_accessor :spans, :klass
-      attr_reader :root
+      attr_reader :root, :settings
 
       def initialize(spans, klass)
         @spans = spans
         @klass = klass
+        @settings = Callstacking::Rails::Settings.new
         @root  = Regexp.new(::Rails.root.to_s)
       end
 
@@ -31,6 +32,8 @@ module Callstacking
         new_method = nil
         if RUBY_VERSION < "2.7.8"
           new_method = tmp_module.define_method(method_name) do |*args, &block|
+            # return super if settings.disabled?
+
             method_name = __method__
 
             path = method(__method__).super_method.source_location.first
