@@ -50,6 +50,10 @@ module Callstacking
         settings[:enabled]
       end
 
+      def excluded
+        settings[:excluded] || []
+      end
+
       def disabled?
         !enabled?
       end

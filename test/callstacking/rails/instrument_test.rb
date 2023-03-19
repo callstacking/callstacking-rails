@@ -8,8 +8,7 @@ module Callstacking
       def setup
         @spans = Callstacking::Rails::Spans.new
         @trace = Callstacking::Rails::Trace.new(@spans)
-
-        @subject = Callstacking::Rails::Instrument.new(@spans, Salutation)
+        @subject = Callstacking::Rails::Instrument.new(@spans)
       end
 
       def test_instrument_klass
@@ -20,8 +19,8 @@ module Callstacking
 
         Salutation.new.hello('Jim')
 
-        @subject.instrument_klass(application_level: false)
-
+        @subject.instrument_klass(Salutation, application_level: false)
+        
         assert_equal true, Salutation.ancestors.include?(SalutationSpan)
         assert_match /instrument.rb/, Salutation.instance_method(:hello).source_location.first
 

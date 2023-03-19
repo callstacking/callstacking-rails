@@ -16,13 +16,16 @@ require "callstacking/rails/traces_helper"
 module Callstacking
   module Rails
     class Engine < ::Rails::Engine
-      cattr_accessor :spans, :trace, :settings
+      EXCLUDED_TEST_CLASSES = ['test/dummy/app/models/salutation.rb'].freeze
+      
+      cattr_accessor :spans, :trace, :settings, :instrumenter, :loader
 
       isolate_namespace Callstacking::Rails
 
       @@settings||=Callstacking::Rails::Settings.new
       @@spans||=Spans.new
       @@trace||=Trace.new(@@spans)
+      @@instrumenter||=Instrument.new(@@spans)
 
       initializer "engine_name.assets.precompile" do |app|
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
@@ -42,12 +45,28 @@ module Callstacking
             inject_hud(@@settings)
           end
 
-          Callstacking::Rails::Loader.new.on_load(@@spans)
+          @@loader = Callstacking::Rails::Loader.new(@@instrumenter,
+                                                     excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
+          @@loader.on_load
 
           @@trace.tracing
         else
           puts "Call Stacking disabled (#{Callstacking::Rails::Env.environment})"
         end
+      end
+
+      def self.start_tracing
+        return false if @@settings.disabled?
+
+        @@instrumenter.enable!(@@loader.klasses)
+        true
+      end
+
+      def self.stop_tracing
+        return false if @@settings.disabled?
+
+        @@instrumenter.disable!
+        true
       end
     end
   end

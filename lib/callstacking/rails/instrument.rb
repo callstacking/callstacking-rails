@@ -4,17 +4,17 @@ require 'rails'
 module Callstacking
   module Rails
     class Instrument
-      attr_accessor :spans, :klass
-      attr_reader :root, :settings
+      attr_accessor :spans
+      attr_reader :root, :settings, :span_modules
 
-      def initialize(spans, klass)
+      def initialize(spans)
         @spans = spans
-        @klass = klass
+        @span_modules = Set.new
         @settings = Callstacking::Rails::Settings.new
         @root  = Regexp.new(::Rails.root.to_s)
       end
 
-      def instrument_method(method_name, application_level: true)
+      def instrument_method(klass, method_name, application_level: true)
         method_path = (klass.instance_method(method_name).source_location.first rescue nil) ||
           (klass.method(method_name).source_location.first rescue nil)
 
@@ -23,7 +23,7 @@ module Callstacking
 
         return if method_path =~ /initializer/i
 
-        tmp_module = find_or_initialize_module
+        tmp_module = find_or_initialize_module(klass)
 
         return if tmp_module.nil? ||
                     tmp_module.instance_methods.include?(method_name) ||
@@ -32,8 +32,6 @@ module Callstacking
         new_method = nil
         if RUBY_VERSION < "2.7.8"
           new_method = tmp_module.define_method(method_name) do |*args, &block|
-            # return super if settings.disabled?
-
             method_name = __method__
 
             path = method(__method__).super_method.source_location.first
@@ -79,31 +77,22 @@ module Callstacking
         new_method
       end
 
-      def find_or_initialize_module
-        name = klass&.name rescue nil
-        return if name.nil?
-
-        module_name = "#{klass.name.gsub('::', '')}Span"
-        module_index = klass.ancestors.map(&:to_s).index(module_name)
-
-        unless module_index
-          new_module = Object.const_set(module_name, Module.new)
-
-          new_module.instance_variable_set("@klass", klass)
-          new_module.instance_variable_set("@spans", spans)
-
-          klass.prepend new_module
-          klass.singleton_class.prepend new_module if klass.class == Module
-
-          return find_or_initialize_module
+      def enable!(klasses)
+        klasses.each do |klass|
+          instrument_klass(klass, application_level: true)
         end
-
-        klass.ancestors[module_index]
+      end
+      def disable!
+        span_modules.each do |mod|
+          mod.instance_methods.each do |method_name|
+            mod.remove_method(method_name)
+          end
+        end
       end
 
-      def instrument_klass(application_level: true)
-        relevant = all_methods - filtered
-        relevant.each { |method| instrument_method(method, application_level: application_level) }
+      def instrument_klass(klass, application_level: true)
+        relevant = all_methods(klass) - filtered
+        relevant.each { |method| instrument_method(klass, method, application_level: application_level) }
       end
 
       def self.arguments_for(m, args)
@@ -121,9 +110,31 @@ module Callstacking
       end
 
       private
+      def find_or_initialize_module(klass)
+        name = klass&.name rescue nil
+        return if name.nil?
 
-      def all_methods
-        @all_methods ||= (klass.instance_methods +
+        module_name = "#{klass.name.gsub('::', '')}Span"
+        module_index = klass.ancestors.map(&:to_s).index(module_name)
+
+        unless module_index
+          new_module = Object.const_set(module_name, Module.new)
+          span_modules << new_module
+
+          new_module.instance_variable_set("@klass", klass)
+          new_module.instance_variable_set("@spans", spans)
+
+          klass.prepend new_module
+          klass.singleton_class.prepend new_module if klass.class == Module
+
+          return find_or_initialize_module(klass)
+        end
+
+        klass.ancestors[module_index]
+      end
+
+      def all_methods(klass)
+        (klass.instance_methods +
           klass.private_instance_methods(false) +
           klass.protected_instance_methods(false) +
           klass.methods +
