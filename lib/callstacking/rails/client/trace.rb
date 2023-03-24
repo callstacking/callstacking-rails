@@ -7,16 +7,18 @@ module Callstacking
         CREATE_URL = "/api/v1/traces.json"
         UPDATE_URL = "/api/v1/traces/:id.json"
 
-        def create(method_name, klass, action_name, format_name, root_path, url, request_id, headers, params)
+        def create(request_id, tuid, method_name, klass, action_name, format_name, root_path, url, headers, params)
           resp = post(CREATE_URL,
                       {},
-                      { method_name: method_name,
+                      {
+                        request_id: request_id,
+                        tuid: tuid,
+                        method_name: method_name,
                         klass: klass,
                         action_name: action_name,
                         format_name: format_name,
                         root_path: root_path,
                         url: url,
-                        request_id: request_id,
                         h: headers.to_h,
                         p: params.to_h,
                       })

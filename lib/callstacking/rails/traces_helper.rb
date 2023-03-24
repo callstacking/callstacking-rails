@@ -9,7 +9,7 @@ module Callstacking
       include ActionView::Context
 
       def hud(url)
-        frame_url = "#{url || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{Callstacking::Rails::Trace.current_request_id}/print"
+        frame_url = "#{url || Callstacking::Rails::Settings::PRODUCTION_URL}/traces/#{Callstacking::Rails::Trace.current_trace_id}/print"
 
         body = []
         body << (content_tag( :div, data: { turbo:false },

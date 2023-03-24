@@ -6,9 +6,11 @@ module Callstacking
     class Trace
       attr_accessor :spans, :client, :lock
       attr_reader :settings
-      cattr_accessor :current_request_id
+      cattr_accessor :current_trace_id
+      cattr_accessor :current_tuid
 
       ICON = '💥'
+      MAX_TRACE_ENTRIES = 3000
 
       def initialize(spans)
         @traces = []
@@ -18,35 +20,52 @@ module Callstacking
         @lock   = Mutex.new
         @client = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
 
-        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
-          create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
-        end
-
-        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
-          create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces)
-        end
+        init_uuids(nil, nil)
+        init_callbacks(nil)
       end
 
-      def tracing
+      def request_tracing
+        tuid     = nil
         trace_id = nil
-        max_trace_entries = nil
 
-        ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |name, start, finish, id, payload|
-          trace_id, max_trace_entries = start_request(payload[:request]&.request_id, payload[:method], payload[:controller],
-                                                      payload[:action], payload[:format], ::Rails.root,
-                                                      payload[:request]&.original_url || payload[:path],
-                                                      payload[:headers], payload[:params])
+        ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |_name, _start, _finish, _id, payload|
+          trace_id, tuid = init_uuids(payload[:request]&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
+          init_callbacks(tuid)
+
+          start_request(trace_id, tuid,
+                        payload[:method], payload[:controller],
+                        payload[:action], payload[:format], ::Rails.root,
+                        payload[:request]&.original_url || payload[:path],
+                        payload[:headers], payload[:params])
         end
 
-        ActiveSupport::Notifications.subscribe("process_action.action_controller") do |name, start, finish, id, payload|
-          complete_request(payload[:method], payload[:controller],
+        ActiveSupport::Notifications.subscribe("process_action.action_controller") do |_name, _start, _finish, _id, payload|
+          complete_request(trace_id, tuid,
+                           payload[:method], payload[:controller],
                            payload[:action], payload[:format],
                            payload[:request]&.original_url || payload[:path],
-                           trace_id, @traces, max_trace_entries)
+                           @traces, MAX_TRACE_ENTRIES)
         end
       end
 
       private
+
+      def init_callbacks(tuid)
+        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
+          create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
+        end
+
+        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
+          create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces)
+        end
+      end
+
+      def init_uuids(trace_id, tuid)
+        Callstacking::Rails::Trace.current_trace_id = trace_id
+        Callstacking::Rails::Trace.current_tuid = tuid
+        
+        return trace_id, tuid
+      end
 
       def completed_request_message(method, controller, action, format)
         "Completed request: #{method} #{controller}##{action} as #{format}"
@@ -56,9 +75,10 @@ module Callstacking
         "Started request: #{method} #{controller}##{action} as #{format}"
       end
 
-      def create_call_return(coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
+      def create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
         lock.synchronize do
-          traces << { type: 'TraceCallReturn',
+          traces << { tuid: tuid,
+                      type: 'TraceCallReturn',
                       order_num: order_num,
                       nesting_level: nesting_level,
                       local_variables: {},
@@ -74,9 +94,10 @@ module Callstacking
         end
       end
 
-      def create_call_entry(nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
+      def create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
-          traces << { type: 'TraceCallEntry',
+          traces << { tuid: tuid,
+                      type: 'TraceCallEntry',
                       order_num: order_num,
                       nesting_level: nesting_level,
                       args: arguments,
@@ -92,9 +113,10 @@ module Callstacking
         end
       end
 
-      def create_message(message, order_num, traces)
+      def create_message(tuid, message, order_num, traces)
         lock.synchronize do
-          traces << { type: 'TraceMessage',
+          traces << { tuid: tuid,
+                      type: 'TraceMessage',
                       order_num: order_num,
                       nesting_level: 0,
                       message: message,
@@ -114,26 +136,24 @@ module Callstacking
         lock.synchronize do
           return if traces.empty?
 
-          client.upsert(trace_id, { trace_entries: traces })
+          client.upsert(trace_id,
+                        { trace_entries: traces })
           traces.clear
         end
       end
-      def start_request(request_id, method, controller, action, format, path, original_url, headers, params)
+      def start_request(trace_id, tuid, method, controller, action, format, path, original_url, headers, params)
         return if do_not_track_request?(original_url, format)
-        
-        request_id = request_id || SecureRandom.uuid
-        Callstacking::Rails::Trace.current_request_id = request_id
 
-        trace_id, _interval, max_trace_entries = client.create(method, controller, action, format,
-                                                               path, original_url, request_id, headers,
-                                                               params)
+        client.create(trace_id, tuid,
+                      method, controller,
+                      action, format,
+                      path, original_url,
+                      headers, params)
 
         print_trace_url(trace_id)
 
-        create_message(start_request_message(method, controller, action, format),
+        create_message(tuid, start_request_message(method, controller, action, format),
                        spans.increment_order_num, @traces)
-
-        return trace_id, max_trace_entries
       end
 
       def print_trace_url(trace_id)
@@ -146,13 +166,13 @@ module Callstacking
         url
       end
 
-      def complete_request(method, controller, action, format, original_url, trace_id, traces, max_trace_entries)
+      def complete_request(trace_id, tuid, method, controller, action, format, original_url, traces, max_trace_entries)
         if do_not_track_request?(original_url, format)
           traces.clear
           return
         end
 
-        create_message(completed_request_message(method, controller, action, format),
+        create_message(tuid, completed_request_message(method, controller, action, format),
                        spans.increment_order_num, traces)
 
         send_traces!(trace_id, traces[0..max_trace_entries])

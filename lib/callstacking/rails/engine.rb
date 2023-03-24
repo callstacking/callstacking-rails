@@ -12,6 +12,7 @@ require "callstacking/rails/client/authenticate"
 require "callstacking/rails/client/trace"
 require "callstacking/rails/cli"
 require "callstacking/rails/traces_helper"
+require "callstacking/rails/time_based_uuid"
 
 module Callstacking
   module Rails
@@ -49,7 +50,7 @@ module Callstacking
                                                      excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
           @@loader.on_load
 
-          @@trace.tracing
+          @@trace.request_tracing
         else
           puts "Call Stacking disabled (#{Callstacking::Rails::Env.environment})"
         end
