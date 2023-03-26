@@ -82,6 +82,7 @@ module Callstacking
           instrument_klass(klass, application_level: true)
         end
       end
+
       def disable!
         span_modules.each do |mod|
           mod.instance_methods.each do |method_name|
@@ -91,8 +92,8 @@ module Callstacking
       end
 
       def instrument_klass(klass, application_level: true)
-        relevant = all_methods(klass) - filtered
-        relevant.each { |method| instrument_method(klass, method, application_level: application_level) }
+        relevant_methods = all_methods(klass) - filtered
+        relevant_methods.each { |method| instrument_method(klass, method, application_level: application_level) }
       end
 
       def self.arguments_for(m, args)
