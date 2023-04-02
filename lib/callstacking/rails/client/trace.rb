@@ -7,33 +7,35 @@ module Callstacking
         CREATE_URL = "/api/v1/traces.json"
         UPDATE_URL = "/api/v1/traces/:id.json"
 
-        def create(request_id, tuid, method_name, klass, action_name, format_name, root_path, url, headers, params)
-          resp = post(CREATE_URL,
-                      {},
-                      {
-                        request_id: request_id,
-                        tuid: tuid,
-                        method_name: method_name,
-                        klass: klass,
-                        action_name: action_name,
-                        format_name: format_name,
-                        root_path: root_path,
-                        url: url,
-                        h: headers.to_h,
-                        p: params.to_h,
-                      })
+        def initialize(url, auth_token)
+          super
 
-          if resp.status == 200
-            return resp.body["trace_id"], resp.body["pulse_interval"], resp.body["max_trace_entries"]
-          end
+          # All requests for trace and trace entry creation are async
+          #   join by the client side generated tuid
+          @async = true
+        end
+
+        def create(request_id, tuid, method_name, klass, action_name, format_name, root_path, url, headers, params)
+          post(CREATE_URL,
+               {},
+               {
+                 request_id: request_id,
+                 tuid: tuid,
+                 method_name: method_name,
+                 klass: klass,
+                 action_name: action_name,
+                 format_name: format_name,
+                 root_path: root_path,
+                 url: url,
+                 h: headers.to_h,
+                 p: params.to_h,
+               })
 
           nil
         end
 
         def upsert(trace_id, traces)
-          resp = patch(UPDATE_URL.gsub(':id', trace_id), {}, traces)
-
-          resp.status
+          patch(UPDATE_URL.gsub(':id', trace_id), {}, traces)
         end
       end
     end

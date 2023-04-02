@@ -23,6 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails", ">= 4"
   spec.add_dependency "faraday", '>= 1.10.3'
   spec.add_dependency 'faraday-follow_redirects'
+  spec.add_dependency 'async-http-faraday'
   spec.add_development_dependency 'mocha'
   spec.add_development_dependency 'minitest-silence'
 end
