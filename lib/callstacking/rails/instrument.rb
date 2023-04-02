@@ -17,6 +17,9 @@ module Callstacking
         method_path = (klass.instance_method(method_name).source_location.first rescue nil) ||
           (klass.method(method_name).source_location.first rescue nil)
 
+        # method was not defined in Ruby (i.e. native)
+        return if method_path.nil?
+
         # Application level method definitions
         return if application_level && !(method_path =~ /#{::Rails.root.to_s}/)
 
