@@ -11,7 +11,7 @@ module Callstacking
         @spans = spans
         @span_modules = Set.new
         @settings = Callstacking::Rails::Settings.new
-        @root  = Regexp.new(::Rails.root.to_s)
+        @root  = Regexp.new(::Rails.root.to_s) # <-------
       end
 
       def instrument_method(klass, method_name, application_level: true)
@@ -19,7 +19,7 @@ module Callstacking
           (klass.method(method_name).source_location.first rescue nil)
 
         # Application level method definitions
-        return unless method_path =~ root if application_level
+        return if method_path =~ /#{::Rails.root.to_s}/ && application_level
 
         return if method_path =~ /initializer/i
 
