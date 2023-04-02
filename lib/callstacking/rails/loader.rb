@@ -3,9 +3,8 @@ require "rails"
 module Callstacking
   module Rails
     class Loader
-      attr_accessor :root, :instrumenter, :klasses, :excluded
+      attr_accessor :instrumenter, :klasses, :excluded
       def initialize(instrumenter, excluded: [])
-        @root = Regexp.new(::Rails.root.to_s)
         @excluded = excluded
         @instrumenter = instrumenter
         @klasses = Set.new
@@ -18,7 +17,7 @@ module Callstacking
 
           excluded_klass = excluded.any? { |ex| path =~ /#{ex}/ }
 
-          if path =~ root &&
+          if path =~ /#{::Rails.root.to_s}/ &&
             !klasses.include?(klass) &&
             !excluded_klass
               instrumenter.instrument_klass(klass)

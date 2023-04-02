@@ -5,13 +5,12 @@ module Callstacking
   module Rails
     class Instrument
       attr_accessor :spans
-      attr_reader :root, :settings, :span_modules
+      attr_reader :settings, :span_modules
 
       def initialize(spans)
         @spans = spans
         @span_modules = Set.new
         @settings = Callstacking::Rails::Settings.new
-        @root  = Regexp.new(::Rails.root.to_s) # <-------
       end
 
       def instrument_method(klass, method_name, application_level: true)
@@ -19,7 +18,7 @@ module Callstacking
           (klass.method(method_name).source_location.first rescue nil)
 
         # Application level method definitions
-        return if method_path =~ /#{::Rails.root.to_s}/ && application_level
+        return if application_level && !(method_path =~ /#{::Rails.root.to_s}/)
 
         return if method_path =~ /initializer/i
 
@@ -146,7 +145,6 @@ module Callstacking
         @filtered ||= (Object.instance_methods + Object.private_instance_methods +
           Object.protected_instance_methods + Object.methods(false)).uniq
       end
-
     end
   end
 end

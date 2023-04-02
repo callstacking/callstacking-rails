@@ -29,6 +29,22 @@ module Callstacking
 
         Salutation.new.hello('Jim')
       end
+
+      def test_application_level_instrumentation
+        assert_equal false, Object.const_defined?(:ApplicationControllerSpan)
+
+        @subject.instrument_klass(::ApplicationController, application_level: true)
+
+        assert_equal true, Object.const_defined?(:ApplicationControllerSpan)
+        assert_equal true, ::ApplicationController.ancestors.include?(::ApplicationControllerSpan)
+        assert_equal true, ::ApplicationController.instance_methods.include?(:index)
+        assert_equal true, ::ApplicationControllerSpan.instance_methods.include?(:index)
+        assert_equal false, ::ApplicationControllerSpan.instance_methods.include?(:run_callbacks)
+
+        @subject.instrument_klass(::ApplicationController, application_level: false)
+        assert_equal true, ::ApplicationController.instance_methods.include?(:run_callbacks)
+        assert_equal true, ::ApplicationControllerSpan.instance_methods.include?(:run_callbacks)
+      end
     end
   end
 end

@@ -34,7 +34,7 @@ module Callstacking
 
           start_request(trace_id, tuid,
                         payload[:method], payload[:controller],
-                        payload[:action], payload[:format], ::Rails.root,
+                        payload[:action], payload[:format], ::Rails.root.to_s,
                         payload[:request]&.original_url || payload[:path],
                         payload[:headers], payload[:params])
         end

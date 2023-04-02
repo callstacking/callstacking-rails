@@ -17,7 +17,7 @@ require "callstacking/rails/time_based_uuid"
 module Callstacking
   module Rails
     class Engine < ::Rails::Engine
-      EXCLUDED_TEST_CLASSES = ['test/dummy/app/models/salutation.rb'].freeze
+      EXCLUDED_TEST_CLASSES = %w[test/dummy/app/models/salutation.rb test/dummy/app/controllers/application_controller.rb].freeze
       
       cattr_accessor :spans, :trace, :settings, :instrumenter, :loader
 
