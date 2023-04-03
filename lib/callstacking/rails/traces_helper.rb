@@ -32,6 +32,7 @@ module Callstacking
             if (e.ctrlKey && e.which == 68) {
               if (document.getElementById("callstacking-debugger").style.display === "none") {
                 document.getElementById("callstacking-debugger").style.display = "block";
+                document.getElementById("callstacking-debugger").contentDocument.location.reload(true);
                 document.getElementById("callstacking-debugger").focus();
               } else {
                 document.getElementById("callstacking-debugger").style.display = "none";
