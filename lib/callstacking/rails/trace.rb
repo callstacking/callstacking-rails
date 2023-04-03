@@ -1,5 +1,5 @@
 require "rails"
-require "active_support/concern"
+require 'active_support/core_ext/object/deep_dup'
 
 module Callstacking
   module Rails
@@ -137,7 +137,7 @@ module Callstacking
           return if traces.empty?
 
           client.upsert(trace_id,
-                        { trace_entries: traces })
+                        { trace_entries: traces.deep_dup })
           traces.clear
         end
       end
