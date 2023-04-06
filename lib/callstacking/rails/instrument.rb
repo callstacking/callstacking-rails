@@ -80,17 +80,23 @@ module Callstacking
       end
 
       def enable!(klasses)
-        klasses.each do |klass|
+        Array.wrap(klasses).each do |klass|
           instrument_klass(klass, application_level: true)
         end
       end
 
-      def disable!
-        span_modules.each do |mod|
+      def disable!(modules = span_modules)
+        modules.each do |mod|
           mod.instance_methods.each do |method_name|
             mod.remove_method(method_name)
           end
         end
+        
+        reset!
+      end
+
+      def reset!
+        span_modules.clear
       end
 
       def instrument_klass(klass, application_level: true)
@@ -133,6 +139,7 @@ module Callstacking
           return find_or_initialize_module(klass)
         end
 
+        span_modules << klass.ancestors[module_index]
         klass.ancestors[module_index]
       end
 

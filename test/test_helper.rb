@@ -29,4 +29,9 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures :all
 end
 
+def module_and_method_exist?(module_name, method_name)
+  Object.const_defined?(module_name.to_sym) &&
+    module_name.constantize.method_defined?(method_name.to_sym)
+end
+
 require 'mocha/minitest'
