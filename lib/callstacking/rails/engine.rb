@@ -37,23 +37,21 @@ module Callstacking
           
         @@loader = Callstacking::Rails::Loader.new(@@instrumenter, excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
         @@loader.on_load
-        @@trace.setup
       end
 
-      def self.start_tracing
-        puts "!!! enabled!"
-
+      def self.start_tracing(controller)
         @@settings.enable!
         @@instrumenter.enable!(@@loader.klasses.to_a)
+        @@trace.begin_trace(controller)
 
         true
       end
 
-      def self.stop_tracing
+      def self.stop_tracing(controller)
         @@settings.disable!
-
-        puts "!!! disabled!"
         @@instrumenter.disable!
+        @@trace.end_trace(controller)
+
         true
       end
     end

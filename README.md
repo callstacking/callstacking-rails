@@ -43,7 +43,17 @@ And then execute:
 ```bash
 $ bundle
 ```
-   
+
+Add the following to your `ApplicationController`:
+
+```
+class ApplicationController < ActionController::Base
+  include Callstacking::Rails::Helpers::InstrumentHelper
+
+  around_action :callstacking_setup, if: -> { params[:debug] == '1' }
+```
+
+
 Register an account at callstacking.com
 ```bash
 callstacking-rails register
@@ -57,16 +67,8 @@ callstacking-rails setup
             
 You're now ready to start tracing.
 
-## Usage
+## CLI Setup
 Usage:
-
-> callstacking-rails enable
-
-Enables the callstacking tracing.
-
-> callstacking-rails disable
-
-Disables the callstacking tracing.
 
 > callstacking-rails register
 
@@ -86,6 +88,9 @@ By setting the RAILS_ENV environment you can maintain multiple settings.
 
 Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues
 
+## Tracing
+To initiate a trace, append the `debug=1` param to the URL of the page you want to trace. As outlined in the `around_action` you setup above.
+
 ## Environment
 
 You can provide the auth token via the `CALLSTACKING_AUTH_TOKEN` environment variable.
@@ -95,9 +100,11 @@ Your API token values can be viewed at https://callstacking.com/api_tokens
 You can enable/disable tracing via the `CALLSTACKING_ENABLED` environment variable (false|true).
 
 ## Trace Output
-When you open a page for your app, once the page has rendered, you will see a `💥` icon on the right hand side.
+For HTML requests, once your page has rendered, you will see a `💥` icon on the right hand side.
 
 Click the icon and observe the full callstack context.
+
+For headless API requests, visit https://callstacking.com/traces to view your traces.
 
 ## Tests
 ``

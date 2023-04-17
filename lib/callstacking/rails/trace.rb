@@ -27,43 +27,25 @@ module Callstacking
         init_callbacks(nil)
       end
 
-      def setup
-        tuid     = nil
-        trace_id = nil
-        enabled  = false
+      def begin_trace(controller)
+        @trace_id, @tuid = init_uuids(controller.request&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
+        init_callbacks(@tuid)
 
-        ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |_name, _start, _finish, _id, payload|
-          if payload[:params][:debug] == '1'
-            enabled = true
-            trace_id, tuid = init_uuids(payload[:request]&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
-            init_callbacks(tuid)
-
-            start_request(trace_id, tuid,
-                          payload[:method], payload[:controller],
-                          payload[:action], payload[:format], ::Rails.root.to_s,
-                          payload[:request]&.original_url || payload[:path],
-                          payload[:headers], payload[:params])
-          end
-        end
-
-        ActiveSupport::Notifications.subscribe("process_action.action_controller") do |_name, _start, _finish, _id, payload|
-          if enabled
-            complete_request(trace_id, tuid,
-                             payload[:method], payload[:controller],
-                             payload[:action], payload[:format],
-                             payload[:request]&.original_url || payload[:path],
-                             @traces, MAX_TRACE_ENTRIES)
-
-            inject_hud(@settings, payload[:request], payload[:response])
-          end
-
-          enabled = false
-        end
+        start_request(@trace_id, @tuid,
+                      controller.action_name, controller.controller_name,
+                      controller.action_name, controller.request.format, ::Rails.root.to_s,
+                      controller.request&.original_url,
+                      controller.request.headers, controller.request.params)
       end
 
-      def teardown
-        ActiveSupport::Notifications.unsubscribe("start_processing.action_controller")
-        ActiveSupport::Notifications.unsubscribe("process_action.action_controller")
+      def end_trace(controller)
+        complete_request(@trace_id, @tuid,
+                         controller.action_name, controller.controller_name,
+                         controller.action_name, controller.request.format,
+                         controller.request&.original_url,
+                         @traces, MAX_TRACE_ENTRIES)
+
+        inject_hud(@settings, controller.request, controller.response)
       end
 
       private

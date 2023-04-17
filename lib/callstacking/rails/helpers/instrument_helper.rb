@@ -4,13 +4,11 @@ module Callstacking
       module InstrumentHelper
         extend ActiveSupport::Concern
         def callstacking_setup
-          if params[:debug] == '1'
-            Callstacking::Rails::Engine.start_tracing
-          end
+          Callstacking::Rails::Engine.start_tracing(self)
 
           yield
         ensure
-          Callstacking::Rails::Engine.stop_tracing if params[:debug] == '1'
+          Callstacking::Rails::Engine.stop_tracing(self)
         end
       end
     end
