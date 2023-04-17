@@ -11,8 +11,8 @@ require "callstacking/rails/client/base"
 require "callstacking/rails/client/authenticate"
 require "callstacking/rails/client/trace"
 require "callstacking/rails/cli"
-require "callstacking/rails/traces_helper"
 require "callstacking/rails/time_based_uuid"
+require "callstacking/rails/helpers/instrument_helper"
 
 module Callstacking
   module Rails
@@ -32,40 +32,27 @@ module Callstacking
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
       end
 
-      initializer 'local_helper.action_controller' do
-        ActiveSupport.on_load :action_controller do
-          include Callstacking::Rails::TracesHelper
-        end
-      end
-
       config.after_initialize do
-        if @@settings.enabled?
-          puts "Call Stacking enabled (#{Callstacking::Rails::Env.environment})"
-
-          ActionController::Base.send :after_action do
-            inject_hud(@@settings)
-          end
-
-          @@loader = Callstacking::Rails::Loader.new(@@instrumenter,
-                                                     excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
-          @@loader.on_load
-
-          @@trace.request_tracing
-        else
-          puts "Call Stacking disabled (#{Callstacking::Rails::Env.environment})"
-        end
+        puts "Call Stacking enabled (#{Callstacking::Rails::Env.environment})"
+          
+        @@loader = Callstacking::Rails::Loader.new(@@instrumenter, excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
+        @@loader.on_load
+        @@trace.setup
       end
 
       def self.start_tracing
-        return false if @@settings.disabled?
+        puts "!!! enabled!"
 
-        @@instrumenter.enable!(@@loader.klasses)
+        @@settings.enable!
+        @@instrumenter.enable!(@@loader.klasses.to_a)
+
         true
       end
 
       def self.stop_tracing
-        return false if @@settings.disabled?
+        @@settings.disable!
 
+        puts "!!! disabled!"
         @@instrumenter.disable!
         true
       end

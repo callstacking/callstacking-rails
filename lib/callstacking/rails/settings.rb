@@ -37,9 +37,16 @@ module Callstacking
       def self.enable!
         ::Rails.cache.write(CACHE_KEY, true)
       end
+      def enable!
+        self.class.enable!
+      end
 
       def self.disable!
         ::Rails.cache.write(CACHE_KEY, false)
+      end
+
+      def disable!
+        self.class.disable!
       end
 
       def enabled?

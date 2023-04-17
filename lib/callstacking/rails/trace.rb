@@ -1,9 +1,12 @@
 require "rails"
 require 'active_support/core_ext/object/deep_dup'
+require "callstacking/rails/helpers/heads_up_display_helper"
 
 module Callstacking
   module Rails
     class Trace
+      include Callstacking::Rails::Helpers::HeadsUpDisplayHelper
+      
       attr_accessor :spans, :client, :lock
       attr_reader :settings
       cattr_accessor :current_trace_id
@@ -13,39 +16,54 @@ module Callstacking
       MAX_TRACE_ENTRIES = 3000
 
       def initialize(spans)
-        @traces = []
-        @spans  = spans
+        @traces   = []
+        @spans    = spans
         @settings = Callstacking::Rails::Settings.new
 
-        @lock   = Mutex.new
-        @client = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
+        @lock     = Mutex.new
+        @client   = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
 
         init_uuids(nil, nil)
         init_callbacks(nil)
       end
 
-      def request_tracing
+      def setup
         tuid     = nil
         trace_id = nil
+        enabled  = false
 
         ActiveSupport::Notifications.subscribe("start_processing.action_controller") do |_name, _start, _finish, _id, payload|
-          trace_id, tuid = init_uuids(payload[:request]&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
-          init_callbacks(tuid)
+          if payload[:params][:debug] == '1'
+            enabled = true
+            trace_id, tuid = init_uuids(payload[:request]&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
+            init_callbacks(tuid)
 
-          start_request(trace_id, tuid,
-                        payload[:method], payload[:controller],
-                        payload[:action], payload[:format], ::Rails.root.to_s,
-                        payload[:request]&.original_url || payload[:path],
-                        payload[:headers], payload[:params])
+            start_request(trace_id, tuid,
+                          payload[:method], payload[:controller],
+                          payload[:action], payload[:format], ::Rails.root.to_s,
+                          payload[:request]&.original_url || payload[:path],
+                          payload[:headers], payload[:params])
+          end
         end
 
         ActiveSupport::Notifications.subscribe("process_action.action_controller") do |_name, _start, _finish, _id, payload|
-          complete_request(trace_id, tuid,
-                           payload[:method], payload[:controller],
-                           payload[:action], payload[:format],
-                           payload[:request]&.original_url || payload[:path],
-                           @traces, MAX_TRACE_ENTRIES)
+          if enabled
+            complete_request(trace_id, tuid,
+                             payload[:method], payload[:controller],
+                             payload[:action], payload[:format],
+                             payload[:request]&.original_url || payload[:path],
+                             @traces, MAX_TRACE_ENTRIES)
+
+            inject_hud(@settings, payload[:request], payload[:response])
+          end
+
+          enabled = false
         end
+      end
+
+      def teardown
+        ActiveSupport::Notifications.unsubscribe("start_processing.action_controller")
+        ActiveSupport::Notifications.unsubscribe("process_action.action_controller")
       end
 
       private
@@ -63,7 +81,7 @@ module Callstacking
       def init_uuids(trace_id, tuid)
         Callstacking::Rails::Trace.current_trace_id = trace_id
         Callstacking::Rails::Trace.current_tuid = tuid
-        
+
         return trace_id, tuid
       end
 

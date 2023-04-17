@@ -20,7 +20,6 @@ module Callstacking
           if path =~ /#{::Rails.root.to_s}/ &&
             !klasses.include?(klass) &&
             !excluded_klass
-              instrumenter.instrument_klass(klass)
               klasses << klass
           end
         end
