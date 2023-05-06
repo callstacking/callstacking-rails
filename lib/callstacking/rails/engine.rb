@@ -33,7 +33,7 @@ module Callstacking
       end
 
       config.after_initialize do
-        puts "Call Stacking enabled (#{Callstacking::Rails::Env.environment})"
+        puts "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
           
         @@loader = Callstacking::Rails::Loader.new(@@instrumenter, excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
         @@loader.on_load
