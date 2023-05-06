@@ -45,25 +45,18 @@ $ bundle
 ```
 
 ## CLI Setup
-Register an account at callstacking.com:
 
-> callstacking-rails register
+*Step 1:*
+> bundle exec callstacking-rails register
+ 
+The above command will open a browser window and allow you to register an account at callstacking.com.
+       
+*Step 2:*
+> bundle exec callstacking-rails setup
 
-Opens a browser window to register as a callstacking.com user.
+This interactively prompts you for your callstacking.com username/password.
 
-> callstacking-rails setup
-
-Interactively prompts you for your callstacking.com username/password.
-Stores auth details in `~/.callstacking`.
-
-You can have multiple environments.
-The default is `development`.
-
-The `development:` section in the `~/.callstacking` config contains your credentials.
-
-By setting the RAILS_ENV environment you can maintain multiple settings.
-
-Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues
+The auth details are stored in `~/.callstacking`.
 
 ## Enabling Tracing
                                         
@@ -105,14 +98,20 @@ The traces are recorded at https://callstacking.com/traces
 
 For local HTML requests, once your page has rendered, you will see a `💥` icon on the right hand side.
 
-Click the icon and observe the full callstack context.
+Click the icon and observe the trace.
 
-For headless API requests, visit https://callstacking.com/traces to view your traces.
+### Headless API requests
+
+The trace URL is output via the Rails logs.  https://callstacking.com/traces will updated with your latest trace.
 
 ## Tests
 ``
 rake app:test:all
 ``
 
+## Questions/Bugs/Feature Requests
+
+Create an issue: https://github.com/callstacking/callstacking-rails/issues
+
 ## License
-The gem is available as open source under the terms of the [GPLv3 License](https://www.gnu.org/licenses/gpl-3.0.en.html).
+The license can be viewed at https://github.com/callstacking/callstacking-rails/blob/main/LICENSE
