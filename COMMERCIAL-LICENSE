@@ -1,0 +1,87 @@
+END USER LICENSE AND CONSULTING AGREEMENT
+
+This Commercial Library License Agreement (the "Agreement") is entered into as of the Effective Date between Blue Sage Data Systems, Inc., a corporation incorporated under the laws of Nebraska, with a principal place of business at 578 Blue Sage Blvd, Lincoln, NE ("Licensor"), and ("Licensee").
+
+WHEREAS, Licensor is the owner of the proprietary software library known as "Call Stacking" (the "Licensed Software"), which provides a set of tools and functionalities for efficient management of telecommunication calls and associated data;
+
+WHEREAS, Licensee desires to obtain a license to use the Licensed Software in connection with the development, distribution, and sale of its products and services;
+
+NOW, THEREFORE, in consideration of the mutual covenants and promises contained herein, and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties hereto agree as follows:
+
+DEFINITIONS
+1.1. "Documentation" means any user manuals, training materials, specifications, or other materials provided by Licensor to Licensee in connection with the Licensed Software.
+
+1.2. "Effective Date" means the date upon which the last party signs this Agreement.
+
+1.3. "Intellectual Property Rights" means all intellectual property rights, including without limitation, copyrights, trademarks, trade secrets, patents, and any other proprietary rights, whether registered or unregistered, and all applications for such rights.
+
+1.4. "Products" means Licensee's products and services that incorporate or make use of the Licensed Software.
+
+LICENSE GRANT
+2.1. Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a non-exclusive, non-transferable, worldwide, royalty-bearing license to:
+
+(a) use the Licensed Software solely for the purpose of developing and distributing Products;
+
+(b) use and reproduce the Documentation in connection with the use and distribution of the Licensed Software.
+
+2.2. Licensee shall not sublicense, rent, lease, or otherwise transfer any of its rights in the Licensed Software or Documentation to any third party without the prior written consent of Licensor.
+
+RESTRICTED USES
+3.1 Licensee shall not use the software as part of a product or service that provides similar functionality to the software itself.
+
+3.2 You must not (nor allow others to): (a) reverse engineer the Software (except when legally allowed); (b) distribute, sell, sublicense, rent, lease, or use the Software for unauthorized purposes; (c) redistribute the Software or Modifications without incorporating them into a substantially different product; (d) redistribute as part of a product, appliance, or virtual server; (e) redistribute on uncontrolled servers; (f) remove proprietary notices from the Software; (g) modify the Software, create derivative works (except as permitted in Section 4), or incorporate without written authorization; (h) publicly disclose performance information or analysis; (i) circumvent or remove copy protection; (j) develop competitive products; or (k) use or distribute unauthorized Source URLs or keycodes. Blue Sage may terminate access without notice if your unique Source library URL is published.
+
+INTELLECTUAL PROPERTY RIGHTS AND OWNERSHIP
+4.1. Licensor retains all right, title, and interest in and to the Licensed Software, Documentation, and all Intellectual Property Rights therein. Nothing in this Agreement shall be construed to transfer any ownership rights in the Licensed Software, Documentation, or any related Intellectual Property Rights from Licensor to Licensee.
+
+4.2. Licensee agrees to promptly notify Licensor in writing of any actual or suspected infringement of the Licensed Software, Documentation, or any related Intellectual Property Rights, and to reasonably cooperate with Licensor in the enforcement of such rights at Licensor's expense.
+
+CONFIDENTIALITY
+5.1. Each party acknowledges that, in the course of performing its obligations under this Agreement, it may obtain information relating to the other party that is of a confidential and proprietary nature ("Confidential Information"). Confidential Information shall include, without limitation, the Licensed Software, Documentation, and any non-public technical, financial, or business information of either party.
+
+5.2. Each party agrees to maintain the confidentiality of the other party's Confidential Information, using the same degree of care that it uses to protect its own confidential information of a similar nature, but in no event less than a reasonable degree of care, and not to use such Confidential Information for any purpose other than as necessary to fulfill its obligations under this Agreement.
+
+WARRANTY AND DISCLAIMER
+6.1. Licensor warrants that it has the necessary rights and authority to enter into this Agreement and grant the license rights set forth herein.
+
+6.2. EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, LICENSOR DISCLAIMS ALL WARRANTIES, EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH RESPECT TO THE LICENSED SOFTWARE AND DOCUMENTATION, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NONINFRINGEMENT. LICENSOR DOES NOT WARRANT THAT THE LICENSED SOFTWARE WILL BE ERROR-FREE OR THAT ITS USE WILL BE UNINTERRUPTED.
+
+LIMITATION OF LIABILITY
+7.1. IN NO EVENT SHALL EITHER PARTY BE LIABLE TO THE OTHER FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, EXEMPLARY, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, LOSS OF DATA, OR BUSINESS INTERRUPTION, ARISING OUT OF OR IN CONNECTION WITH THIS AGREEMENT, THE USE OR INABILITY TO USE THE LICENSED SOFTWARE OR DOCUMENTATION, OR THE PERFORMANCE OR NON-PERFORMANCE OF ANY PRODUCTS, WHETHER BASED ON CONTRACT, TORT, OR ANY OTHER LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+7.2. EACH PARTY'S TOTAL LIABILITY TO THE OTHER UNDER THIS AGREEMENT SHALL NOT EXCEED THE AMOUNTS PAID OR PAYABLE BY LICENSEE TO LICENSOR FOR THE LICENSED SOFTWARE DURING THE ONE (1) MONTH IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO SUCH LIABILITY.
+
+TERM AND TERMINATION
+8.1. This Agreement shall commence on the Effective Date and continue for an initial term of [Number] years, unless earlier terminated in accordance with the provisions of this Section 8. Thereafter, this Agreement shall automatically renew for successive [Number]-year terms unless either party provides written notice of its intent not to renew at least [Number] days prior to the expiration of the then-current term.
+
+8.2. Either party may terminate this Agreement upon written notice to the other party in the event that the other party materially breaches any term or condition of this Agreement and fails to cure such breach within [Number] days after receipt of written notice thereof.
+
+8.3. Upon termination or expiration of this Agreement, Licensee shall immediately cease all use of the Licensed Software and Documentation and shall within [Number] days return or destroy all copies thereof in its possession or control.
+
+MISCELLANEOUS
+9.1. This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior or contemporaneous agreements, understandings, and communications, whether oral or written.
+
+9.2. This Agreement may be amended only by a written document signed by both parties.
+
+9.3. This Agreement shall be governed by and construed in accordance with the laws of the [State], without regard to its conflicts of laws principles.
+
+9.4. Any notices required or permitted under this Agreement shall be in writing and shall be deemed given when delivered personally, or three (3) days after being sent by certified or registered mail, postage prepaid, return receipt requested, to the addresses set forth above.
+
+9.5. Neither party may assign or transfer its rights or obligations under this Agreement without the prior written consent of the other party, except that either party may assign this Agreement in connection with a merger, reorganization, or sale of all or substantially all of its assets, provided that the assignee assumes all of the assigning party's obligations hereunder.
+
+WHITE GLOVE CONSULTING SERVICES
+10.1. Licensor may, upon request by Licensee and at Licensor's discretion, provide additional consulting services related to the Licensed Software, including but not limited to, customization, integration, training, and support (the "Consulting Services"). The Consulting Services shall be considered as "White Glove" services, meaning that Licensor will provide a high level of personalized attention and expertise to Licensee.
+
+10.2. The Consulting Services shall be provided at a rate of $1,000 per hour, billed in increments of no less than one (1) hour, unless otherwise agreed upon by the parties in writing. Licensee shall pay all invoices for Consulting Services within 15 days of receipt.
+
+10.3. Licensor's liability for the Consulting Services performed under this Agreement shall be limited as follows:
+
+(a) Licensor shall exercise commercially reasonable efforts to perform the Consulting Services in a professional and workmanlike manner, consistent with industry standards.
+
+(b) In the event of any errors, omissions, or other defects in the Consulting Services, Licensor's sole liability and Licensee's exclusive remedy shall be, at Licensor's option, either: (i) re-performance of the affected Consulting Services, or (ii) refund of the fees paid by Licensee for the affected Consulting Services.
+
+(c) IN NO EVENT SHALL LICENSOR BE LIABLE TO LICENSEE FOR ANY INDIRECT, INCIDENTAL, CONSEQUENTIAL, SPECIAL, EXEMPLARY, OR PUNITIVE DAMAGES ARISING OUT OF OR IN CONNECTION WITH THE CONSULTING SERVICES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, LOSS OF DATA, OR BUSINESS INTERRUPTION, WHETHER BASED ON CONTRACT, TORT, OR ANY OTHER LEGAL THEORY, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+(d) LICENSOR'S TOTAL LIABILITY TO LICENSEE FOR THE CONSULTING SERVICES PERFORMED UNDER THIS AGREEMENT SHALL NOT EXCEED THE AMOUNTS PAID OR PAYABLE BY LICENSEE TO LICENSOR FOR THE CONSULTING SERVICES DURING THE ONE (1) MONTH IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO SUCH LIABILITY.
+
+10.4. Licensee acknowledges and agrees that any advice, recommendations, or information provided by Licensor as part of the Consulting Services are intended solely for Licensee's internal use and shall not be construed as a guarantee of any specific outcome or result. Licensee remains solely responsible for making its own decisions and for taking any actions based on such advice, recommendations, or information.

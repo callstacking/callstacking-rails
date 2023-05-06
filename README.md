@@ -44,31 +44,8 @@ And then execute:
 $ bundle
 ```
 
-Add the following to your `ApplicationController`:
-
-```
-class ApplicationController < ActionController::Base
-  include Callstacking::Rails::Helpers::InstrumentHelper
-
-  around_action :callstacking_setup, if: -> { params[:debug] == '1' }
-```
-
-
-Register an account at callstacking.com
-```bash
-callstacking-rails register
-```
-
-Authenticate to your newly created account.
-
-```bash
-callstacking-rails setup
-```
-            
-You're now ready to start tracing.
-
 ## CLI Setup
-Usage:
+Register an account at callstacking.com:
 
 > callstacking-rails register
 
@@ -88,19 +65,43 @@ By setting the RAILS_ENV environment you can maintain multiple settings.
 
 Questions? Create an issue: https://github.com/callstacking/callstacking-rails/issues
 
-## Tracing
-To initiate a trace, append the `debug=1` param to the URL of the page you want to trace. As outlined in the `around_action` you setup above.
+## Enabling Tracing
+                                        
+Call Stacking provides a helper method `callstacking_setup` that you can use to enable tracing for a given request.
 
-## Environment
+You control how you enable tracing.
 
-You can provide the auth token via the `CALLSTACKING_AUTH_TOKEN` environment variable.
+Here's a sample setup to add tracing to your requests that both checks for the current user to be an admin 
+and for a `debug` param to be set to `1`:
+
+```
+class ApplicationController < ActionController::Base
+  include Callstacking::Rails::Helpers::InstrumentHelper
+
+  around_action :callstacking_setup, if: -> { current_user&.admin? && params[:debug] == '1' }
+```
+
+For the above setup, you would you have to be authenticated as an admin and would append `?debug=1` 
+to the URL you wish to trace.
+
+e.g.
+
+* http://localhost:3000/?debug=1
+* http://example.com/?debug=1
+
+The local Rails server log outputs the trace URL. 
+
+## Production Environment
+
+For production, you can provide the auth token via the `CALLSTACKING_API_TOKEN` environment variable.
 
 Your API token values can be viewed at https://callstacking.com/api_tokens
 
-You can enable/disable tracing via the `CALLSTACKING_ENABLED` environment variable (false|true).
+The traces are recorded at https://callstacking.com/traces
 
-## Trace Output
-For HTML requests, once your page has rendered, you will see a `💥` icon on the right hand side.
+## Local Development: Heads Up Debugger
+
+For local HTML requests, once your page has rendered, you will see a `💥` icon on the right hand side.
 
 Click the icon and observe the full callstack context.
 
