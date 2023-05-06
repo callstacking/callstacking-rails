@@ -91,6 +91,8 @@ e.g.
 
 The local Rails server log outputs the trace URL. 
 
+<img width="1141" alt="screenshot of trace url output in Rails logs" src="https://user-images.githubusercontent.com/4600/236599713-49a82a83-d8c0-4e51-9442-5da1fbca7f9c.png">
+
 ## Production Environment
 
 For production, you can provide the auth token via the `CALLSTACKING_API_TOKEN` environment variable.
