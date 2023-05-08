@@ -25,7 +25,9 @@ module Callstacking
         end
 
         trace.enable
+      end
 
+      def reset!
         instrumenter.instrument_method(ActionView::PartialRenderer, :render, application_level: false)
         instrumenter.instrument_method(ActionView::TemplateRenderer, :render, application_level: false)
       end

@@ -80,6 +80,8 @@ module Callstacking
       end
 
       def enable!(klasses)
+        reset!
+
         Array.wrap(klasses).each do |klass|
           instrument_klass(klass, application_level: true)
         end
@@ -127,7 +129,10 @@ module Callstacking
         module_index = klass.ancestors.map(&:to_s).index(module_name)
 
         unless module_index
-          new_module = Object.const_set(module_name, Module.new)
+          # Development class reload -
+          #   ancestors are reset but module definition remains
+          new_module = Object.const_get(module_name) rescue nil
+          new_module||=Object.const_set(module_name, Module.new)
           span_modules << new_module
 
           new_module.instance_variable_set("@klass", klass)

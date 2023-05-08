@@ -35,10 +35,12 @@ module Callstacking
                       controller.action_name, controller.controller_name,
                       controller.action_name, controller.request.format, ::Rails.root.to_s,
                       controller.request&.original_url,
-                      controller.request.headers, controller.request.params)
+                      controller.request.headers, controller.request.params, @traces)
       end
 
       def end_trace(controller)
+        return if @trace_id.nil? || @tuid.nil?
+        
         complete_request(@trace_id, @tuid,
                          controller.action_name, controller.controller_name,
                          controller.action_name, controller.request.format,
@@ -141,7 +143,11 @@ module Callstacking
           traces.clear
         end
       end
-      def start_request(trace_id, tuid, method, controller, action, format, path, original_url, headers, params)
+      def start_request(trace_id, tuid, method, controller, action, format, path, original_url, headers, params, traces)
+        lock.synchronize do
+          traces.clear
+        end
+
         return if do_not_track_request?(original_url, format)
 
         client.create(trace_id, tuid,
@@ -167,10 +173,7 @@ module Callstacking
       end
 
       def complete_request(trace_id, tuid, method, controller, action, format, original_url, traces, max_trace_entries)
-        if do_not_track_request?(original_url, format)
-          traces.clear
-          return
-        end
+        return if do_not_track_request?(original_url, format)
 
         create_message(tuid, completed_request_message(method, controller, action, format),
                        spans.increment_order_num, traces)

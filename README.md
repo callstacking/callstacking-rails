@@ -71,7 +71,7 @@ and for a `debug` param to be set to `1`:
 class ApplicationController < ActionController::Base
   include Callstacking::Rails::Helpers::InstrumentHelper
 
-  around_action :callstacking_setup, if: -> { current_user&.admin? && params[:debug] == '1' }
+  prepend_around_action :callstacking_setup, if: -> { current_user&.admin? && params[:debug] == '1' }
 ```
 
 For the above setup, you would you have to be authenticated as an admin and would append `?debug=1` 

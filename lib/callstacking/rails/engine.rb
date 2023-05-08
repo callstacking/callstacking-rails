@@ -41,6 +41,7 @@ module Callstacking
 
       def self.start_tracing(controller)
         @@settings.enable!
+        @@loader.reset!
         @@instrumenter.enable!(@@loader.klasses.to_a)
         @@trace.begin_trace(controller)
 
