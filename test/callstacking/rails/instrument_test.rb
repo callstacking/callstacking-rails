@@ -13,6 +13,7 @@ module Callstacking
         @spans   = Callstacking::Rails::Spans.new
         @trace   = Callstacking::Rails::Trace.new(@spans)
         @subject = Callstacking::Rails::Instrument.new(@spans)
+        @settings = Callstacking::Rails::Settings.new
 
         # The tests run in random order.
         # The above TEST_MODULES may or may not be globally defined.
@@ -22,6 +23,7 @@ module Callstacking
         end.compact
 
         @subject.disable!(modules)
+        @settings.enable!
       end
 
       def test_instrument_klass

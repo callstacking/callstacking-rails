@@ -34,6 +34,9 @@ module Callstacking
         new_method = nil
         if RUBY_VERSION < "2.7.8"
           new_method = tmp_module.define_method(method_name) do |*args, &block|
+            settings = tmp_module.instance_variable_get(:@settings)
+            return super(*args, &block) if settings.disabled?
+            
             method_name = __method__
 
             path = method(__method__).super_method.source_location.first
@@ -55,6 +58,9 @@ module Callstacking
           new_method.ruby2_keywords if new_method.respond_to?(:ruby2_keywords)
         else
           new_method = tmp_module.define_method(method_name) do |*args, **kwargs, &block|
+            settings = tmp_module.instance_variable_get(:@settings)
+            return super(*args, **kwargs, &block) if settings.disabled?
+
             method_name = __method__
 
             path = method(__method__).super_method.source_location.first
@@ -137,6 +143,7 @@ module Callstacking
 
           new_module.instance_variable_set("@klass", klass)
           new_module.instance_variable_set("@spans", spans)
+          new_module.instance_variable_set("@settings", settings)
 
           klass.prepend new_module
           klass.singleton_class.prepend new_module if klass.class == Module

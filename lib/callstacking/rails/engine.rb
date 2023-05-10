@@ -25,8 +25,9 @@ module Callstacking
 
       @@settings||=Callstacking::Rails::Settings.new
       @@spans||=Spans.new
-      @@trace||=Trace.new(@@spans)
+      @@traces||={}
       @@instrumenter||=Instrument.new(@@spans)
+      @@lock||=Mutex.new
 
       initializer "engine_name.assets.precompile" do |app|
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
@@ -39,20 +40,35 @@ module Callstacking
         @@loader.on_load
       end
 
+      # Serialize all tracing requests for now.
+      #  Can enable parallel tracing later.
       def self.start_tracing(controller)
         @@settings.enable!
-        @@loader.reset!
-        @@instrumenter.enable!(@@loader.klasses.to_a)
-        @@trace.begin_trace(controller)
+
+        @@lock.synchronize do
+          if @@traces.empty?
+            @@loader.reset!
+            @@instrumenter.enable!(@@loader.klasses.to_a)
+          end
+
+          @@traces[Thread.current.object_id] = Trace.new(@@spans)
+          @@traces[Thread.current.object_id].begin_trace(controller)
+        end
 
         true
       end
 
       def self.stop_tracing(controller)
         @@settings.disable!
-        @@instrumenter.disable!
-        @@trace.end_trace(controller)
 
+        trace = nil
+        @@lock.synchronize do
+          trace = @@traces.delete(Thread.current.object_id)
+          @@instrumenter.disable! if @@traces.empty?
+        end
+
+        trace&.end_trace(controller)
+        
         true
       end
     end

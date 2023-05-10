@@ -35,14 +35,14 @@ module Callstacking
       end
 
       def self.enable!
-        ::Rails.cache.write(CACHE_KEY, true)
+        Thread.current[CACHE_KEY] = true
       end
       def enable!
         self.class.enable!
       end
 
       def self.disable!
-        ::Rails.cache.write(CACHE_KEY, false)
+        Thread.current[CACHE_KEY] = false
       end
 
       def disable!
@@ -50,11 +50,9 @@ module Callstacking
       end
 
       def enabled?
-        return ::Rails.cache.read(CACHE_KEY) unless ::Rails.cache.read(CACHE_KEY).nil?
-        return false if ENV[ENV_KEY] == 'false'
-        return false if settings.nil?
-        
-        settings[:enabled]
+        return Thread.current[CACHE_KEY] unless Thread.current[CACHE_KEY].nil?
+        return ActiveRecord::Type::Boolean.new.cast(ENV[ENV_KEY]) if ENV[ENV_KEY].present?
+        false
       end
 
       def excluded
