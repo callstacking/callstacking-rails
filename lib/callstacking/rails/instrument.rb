@@ -7,8 +7,8 @@ module Callstacking
       attr_accessor :spans
       attr_reader :settings, :span_modules
 
-      def initialize(spans)
-        @spans = spans
+      def initialize
+        @spans = {}
         @span_modules = Set.new
         @settings = Callstacking::Rails::Settings.new
       end
@@ -45,13 +45,14 @@ module Callstacking
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
             spans = tmp_module.instance_variable_get(:@spans)
+            span  = spans[Thread.current.object_id]
             klass = tmp_module.instance_variable_get(:@klass)
 
             arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
-            spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            span.call_entry(klass, method_name, arguments, p || path, l || line_no)
             return_val = super(*args, &block)
-            spans.call_return(klass, method_name, p || path, l || line_no, return_val)
+            span.call_return(klass, method_name, p || path, l || line_no, return_val)
 
             return_val
           end
@@ -69,13 +70,15 @@ module Callstacking
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
             spans = tmp_module.instance_variable_get(:@spans)
+            span  = spans[Thread.current.object_id]
             klass = tmp_module.instance_variable_get(:@klass)
 
             arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
-            spans.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            span.call_entry(klass, method_name, arguments, p || path, l || line_no)
             return_val = super(*args, **kwargs, &block)
-            spans.call_return(klass, method_name, p || path, l || line_no, return_val)
+
+            span.call_return(klass, method_name, p || path, l || line_no, return_val)
 
             return_val
           end
@@ -86,8 +89,6 @@ module Callstacking
       end
 
       def enable!(klasses)
-        reset!
-
         Array.wrap(klasses).each do |klass|
           instrument_klass(klass, application_level: true)
         end
@@ -101,6 +102,10 @@ module Callstacking
         end
         
         reset!
+      end
+
+      def instrumentation_required?
+        span_modules.empty?
       end
 
       def reset!
@@ -124,6 +129,10 @@ module Callstacking
         filter = ::Rails.application.config.filter_parameters
         f = ActiveSupport::ParameterFilter.new filter
         f.filter h
+      end
+
+      def add_span(span)
+        spans[Thread.current.object_id] ||= span
       end
 
       private

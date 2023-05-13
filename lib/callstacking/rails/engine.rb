@@ -17,17 +17,18 @@ require "callstacking/rails/helpers/instrument_helper"
 module Callstacking
   module Rails
     class Engine < ::Rails::Engine
-      EXCLUDED_TEST_CLASSES = %w[test/dummy/app/models/salutation.rb test/dummy/app/controllers/application_controller.rb].freeze
+      EXCLUDED_TEST_CLASSES = %w[test/dummy/app/models/salutation.rb 
+                                 test/dummy/app/controllers/application_controller.rb].freeze
       
-      cattr_accessor :spans, :trace, :settings, :instrumenter, :loader
+      cattr_accessor :spans, :traces, :settings, :instrumenter, :loader, :lock
 
       isolate_namespace Callstacking::Rails
 
-      @@settings||=Callstacking::Rails::Settings.new
-      @@spans||=Spans.new
+      @@spans||={}
       @@traces||={}
-      @@instrumenter||=Instrument.new(@@spans)
       @@lock||=Mutex.new
+      @@instrumenter||=Instrument.new
+      @@settings||=Callstacking::Rails::Settings.new
 
       initializer "engine_name.assets.precompile" do |app|
         app.config.assets.precompile << "checkpoint_rails_manifest.js"
@@ -37,34 +38,46 @@ module Callstacking
         puts "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
           
         @@loader = Callstacking::Rails::Loader.new(@@instrumenter, excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
-        @@loader.on_load
+        loader.on_load
+        loader.reset!
       end
 
       # Serialize all tracing requests for now.
       #  Can enable parallel tracing later.
       def self.start_tracing(controller)
-        @@settings.enable!
+        settings.enable!
 
-        @@lock.synchronize do
-          if @@traces.empty?
-            @@loader.reset!
-            @@instrumenter.enable!(@@loader.klasses.to_a)
+        lock.synchronize do
+          spans[Thread.current.object_id]||=Spans.new
+          span = spans[Thread.current.object_id]
+
+          instrumenter.add_span(spans[Thread.current.object_id])
+
+          if instrumenter.instrumentation_required?
+            loader.reset!
+            instrumenter.enable!(loader.klasses.to_a)
           end
 
-          @@traces[Thread.current.object_id] = Trace.new(@@spans)
-          @@traces[Thread.current.object_id].begin_trace(controller)
+          puts "** controller action : #{controller.action_name}"
+
+          traces[Thread.current.object_id] = Trace.new(span)
+          trace = traces[Thread.current.object_id]
+
+          trace.begin_trace(controller)
         end
 
         true
       end
 
       def self.stop_tracing(controller)
-        @@settings.disable!
+        settings.disable!
 
         trace = nil
-        @@lock.synchronize do
-          trace = @@traces.delete(Thread.current.object_id)
-          @@instrumenter.disable! if @@traces.empty?
+        lock.synchronize do
+          trace = traces.delete(Thread.current.object_id)
+          if traces.empty?
+            instrumenter.disable!
+          end
         end
 
         trace&.end_trace(controller)

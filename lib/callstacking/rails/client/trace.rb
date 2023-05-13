@@ -6,6 +6,7 @@ module Callstacking
       class Trace < Base
         CREATE_URL = "/api/v1/traces.json"
         UPDATE_URL = "/api/v1/traces/:id.json"
+        SHOW_URL = "/api/v1/traces/:id.json"
 
         def initialize(url, auth_token)
           super
@@ -36,6 +37,10 @@ module Callstacking
 
         def upsert(trace_id, traces)
           patch(UPDATE_URL.gsub(':id', trace_id), {}, traces)
+        end
+
+        def show(trace_id, params = {})
+          get(SHOW_URL.gsub(':id', trace_id), params)
         end
       end
     end

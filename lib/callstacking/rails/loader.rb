@@ -15,11 +15,14 @@ module Callstacking
           klass = tp.self
           path  = tp.path
 
+          puts "klass loaded = #{klass} #{path} #{::Rails.root.to_s}" if %w[German French English].include?(klass.to_s)
+
           excluded_klass = excluded.any? { |ex| path =~ /#{ex}/ }
 
           if path =~ /#{::Rails.root.to_s}/ &&
             !klasses.include?(klass) &&
             !excluded_klass
+              instrumenter.instrument_klass(klass)
               klasses << klass
           end
         end

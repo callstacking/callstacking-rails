@@ -35,7 +35,7 @@ module Callstacking
           end
         end
 
-        def get(url, params = {})
+        def get(url, params = {}, headers = {})
           if async
             threads << Thread.new do
               connection.get(url, params, headers)

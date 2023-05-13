@@ -430,10 +430,10 @@
               </RakeTaskImpl>
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Build callstacking-rails-0.1.29.gem into the pkg directory" fullCommand="build" id="build" />
+          <RakeTaskImpl description="Build callstacking-rails-0.1.30.gem into the pkg directory" fullCommand="build" id="build" />
           <RakeTaskImpl id="build">
             <subtasks>
-              <RakeTaskImpl description="Generate SHA512 checksum if callstacking-rails-0.1.29.gem into the checksums directory" fullCommand="build:checksum" id="checksum" />
+              <RakeTaskImpl description="Generate SHA512 checksum if callstacking-rails-0.1.30.gem into the checksums directory" fullCommand="build:checksum" id="checksum" />
             </subtasks>
           </RakeTaskImpl>
           <RakeTaskImpl description="Remove any temporary products" fullCommand="clean" id="clean" />
@@ -485,13 +485,13 @@
               </RakeTaskImpl>
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Build and install callstacking-rails-0.1.29.gem into system gems" fullCommand="install" id="install" />
+          <RakeTaskImpl description="Build and install callstacking-rails-0.1.30.gem into system gems" fullCommand="install" id="install" />
           <RakeTaskImpl id="install">
             <subtasks>
-              <RakeTaskImpl description="Build and install callstacking-rails-0.1.29.gem into system gems without network access" fullCommand="install:local" id="local" />
+              <RakeTaskImpl description="Build and install callstacking-rails-0.1.30.gem into system gems without network access" fullCommand="install:local" id="local" />
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Create tag v0.1.29 and build and push callstacking-rails-0.1.29.gem to rubygems.org" fullCommand="release[remote]" id="release[remote]" />
+          <RakeTaskImpl description="Create tag v0.1.30 and build and push callstacking-rails-0.1.30.gem to rubygems.org" fullCommand="release[remote]" id="release[remote]" />
           <RakeTaskImpl description="Report code statistics (KLOCs, etc) from the application or engine" fullCommand="stats" id="stats" />
           <RakeTaskImpl description="" fullCommand="environment" id="environment" />
           <RakeTaskImpl description="" fullCommand="load_app" id="load_app" />
