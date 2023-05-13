@@ -12,9 +12,10 @@ module Callstacking
       def setup
         @spans   = Callstacking::Rails::Spans.new
         @trace   = Callstacking::Rails::Trace.new(@spans)
-        @subject = Callstacking::Rails::Instrument.new(@spans)
+        @subject = Callstacking::Rails::Instrument.new
         @settings = Callstacking::Rails::Settings.new
 
+        @subject.add_span(@spans)
         # The tests run in random order.
         # The above TEST_MODULES may or may not be globally defined.
         # Need to reset them for each test.
