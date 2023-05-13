@@ -75,6 +75,8 @@ module Callstacking
 
             arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
+            puts "*** method_name = #{method_name} #{arguments} #{p} #{l}"
+
             span.call_entry(klass, method_name, arguments, p || path, l || line_no)
             return_val = super(*args, **kwargs, &block)
 

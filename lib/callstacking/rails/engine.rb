@@ -36,22 +36,26 @@ module Callstacking
 
       config.after_initialize do
         puts "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
-          
-        @@loader = Callstacking::Rails::Loader.new(@@instrumenter, excluded: @@settings.excluded + EXCLUDED_TEST_CLASSES)
+        
+        spans[Thread.current.object_id]||=Spans.new
+        instrumenter.add_span(spans[Thread.current.object_id])
+
+        @@loader = Callstacking::Rails::Loader.new(instrumenter, excluded: settings.excluded + EXCLUDED_TEST_CLASSES)
         loader.on_load
-        loader.reset!
+        # loader.reset!
       end
 
       # Serialize all tracing requests for now.
       #  Can enable parallel tracing later.
       def self.start_tracing(controller)
+        puts "Start tracing!"
         settings.enable!
 
         lock.synchronize do
           spans[Thread.current.object_id]||=Spans.new
           span = spans[Thread.current.object_id]
 
-          instrumenter.add_span(spans[Thread.current.object_id])
+          instrumenter.add_span(span)
 
           if instrumenter.instrumentation_required?
             loader.reset!
@@ -70,6 +74,8 @@ module Callstacking
       end
 
       def self.stop_tracing(controller)
+        puts "Stop tracing!"
+
         settings.disable!
 
         trace = nil
