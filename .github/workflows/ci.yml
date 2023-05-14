@@ -45,4 +45,6 @@ jobs:
       - name: Run tests
         run: bundle exec rake app:test:all
         continue-on-error: ${{ matrix.continue-on-error }}
+        env:
+          CALLSTACKING_API_TOKEN: ${{ secrets.CALLSTACKING_API_TOKEN }}
         

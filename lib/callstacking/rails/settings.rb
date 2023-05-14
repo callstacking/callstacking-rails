@@ -23,9 +23,7 @@ module Callstacking
       end
 
       def auth_token
-        x = ENV['CALLSTACKING_API_TOKEN'] || settings[:auth_token]
-        raise "No auth token found. #{ENV['CALLSTACKING_API_TOKEN']} Please run `callstacking login` to get one." if x.nil?
-        x
+        ENV['CALLSTACKING_API_TOKEN'] || settings[:auth_token]
       end
 
       def auth_token?
