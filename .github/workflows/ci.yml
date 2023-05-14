@@ -22,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Capture Output
-        uses: selfagency/capture-output@v1
-
       - name: Checkout
         uses: actions/checkout@v3
 
