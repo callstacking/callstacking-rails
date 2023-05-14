@@ -13,7 +13,7 @@ Callstacking::Rails::Settings.new.save('test@test.com',
                                        'testing123',
                                        Callstacking::Rails::Settings::PRODUCTION_URL)
 
-ENV[Callstacking::Rails::Settings::ENV_KEY] = 'true'
+# ENV[Callstacking::Rails::Settings::ENV_KEY] = 'false'
 
 
 require_relative "../test/dummy/config/environment"
