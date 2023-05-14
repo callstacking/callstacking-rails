@@ -8,7 +8,7 @@ ENV["RAILS_ENV"] = "test"
 
 # https://github.com/Shopify/minitest-silence
 # ENV["CI"] = "true"
-
+#
 Callstacking::Rails::Settings.new.save('test@test.com',
                                        'testing123',
                                        Callstacking::Rails::Settings::PRODUCTION_URL)
