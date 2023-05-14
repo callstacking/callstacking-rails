@@ -2,6 +2,8 @@ require "test_helper"
 # CALLSTACKING_API_TOKEN required for these integration tests. Full end-to-end.
 # https://github.com/callstacking/callstacking-rails/settings/secrets/actions
 class ThreadSafetyTest < ActionDispatch::IntegrationTest
+  TEST_URL = "http://www.example.com"
+
   test "concurrent tracing" do
     urls      = {'/hello?debug=1'   => 'English',
                  '/bounjor?debug=1' => 'French',
@@ -19,7 +21,7 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
     threads.each(&:join)
 
     urls.each do |url, klass|
-      response = client.show("xxxx", url: "http://www.example.com#{url}")
+      response = client.show('xxxx', url: "#{TEST_URL}#{url}")
       json     = response.body
 
       json['trace_entries'][1..10].each do |trace_entry|

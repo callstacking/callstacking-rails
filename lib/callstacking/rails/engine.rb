@@ -48,7 +48,6 @@ module Callstacking
       # Serialize all tracing requests for now.
       #  Can enable parallel tracing later.
       def self.start_tracing(controller)
-        puts "Start tracing!"
         settings.enable!
 
         lock.synchronize do
@@ -62,8 +61,6 @@ module Callstacking
             instrumenter.enable!(loader.klasses.to_a)
           end
 
-          puts "** controller action : #{controller.action_name}"
-
           traces[Thread.current.object_id] = Trace.new(span)
           trace = traces[Thread.current.object_id]
 
@@ -74,8 +71,6 @@ module Callstacking
       end
 
       def self.stop_tracing(controller)
-        puts "Stop tracing!"
-
         settings.disable!
 
         trace = nil

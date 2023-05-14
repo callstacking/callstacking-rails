@@ -46,6 +46,8 @@ module Callstacking
         Trace.any_instance.expects(:create_call_return)
 
         Salutation.new.hello('Jim')
+
+        @subject.disable!([::SalutationSpan])
       end
 
       def test_application_level_instrumentation
@@ -62,6 +64,7 @@ module Callstacking
         @subject.instrument_klass(::ApplicationController, application_level: false)
         assert_equal true, ::ApplicationController.instance_methods.include?(:run_callbacks)
         assert_equal true, ::ApplicationControllerSpan.instance_methods.include?(:run_callbacks)
+        @subject.disable!([::ApplicationControllerSpan])
       end
 
       def test_enable_disable
