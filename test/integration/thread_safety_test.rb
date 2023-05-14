@@ -26,6 +26,8 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
 
       STDERR.puts "Trace response: -- #{response.inspect} -- json #{json.inspect}"
 
+      sleep 5
+      
       json['trace_entries'][1..10].each do |trace_entry|
         assert_equal klass, trace_entry['klass']
       end

@@ -13,3 +13,5 @@ Callstacking env: <%= Callstacking::Rails::Env.environment %>
 Settings: <%= @settings.settings %>
 <hr/>
 Enabled: <%= @settings.enabled? %>
+<hr/>
+Instrumented klasses: <%= ::Callstacking::Rails::Engine.loader.klasses.to_a.inspect %>
