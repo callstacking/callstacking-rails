@@ -3,6 +3,7 @@ require 'callstacking/rails/settings'
 require 'callstacking/rails/env'
 require 'callstacking/rails/client/base'
 require 'callstacking/rails/client/authenticate'
+require "callstacking/rails/logger"
 
 ENV["RAILS_ENV"] = "test"
 
