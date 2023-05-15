@@ -1,4 +1,5 @@
 require "rails"
+require "callstacking/rails/logger"
 
 module Callstacking
   module Rails
@@ -15,6 +16,8 @@ module Callstacking
           klass = tp.self
           path  = tp.path
 
+          Logger.log("Callstacking::Rails::Loader.on_load #{klass} #{path}")
+          
           excluded_klass = excluded.any? { |ex| path =~ /#{ex}/ }
 
           if path =~ /#{::Rails.root.to_s}/ &&
