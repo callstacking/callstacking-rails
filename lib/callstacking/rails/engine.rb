@@ -13,6 +13,7 @@ require "callstacking/rails/client/trace"
 require "callstacking/rails/cli"
 require "callstacking/rails/time_based_uuid"
 require "callstacking/rails/helpers/instrument_helper"
+require "callstacking/rails/logger"
 
 module Callstacking
   module Rails
@@ -35,7 +36,7 @@ module Callstacking
       end
 
       config.after_initialize do
-        puts "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
+        Logger.log "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
         
         spans[Thread.current.object_id]||=Spans.new
         instrumenter.add_span(spans[Thread.current.object_id])
@@ -48,6 +49,8 @@ module Callstacking
       # Serialize all tracing requests for now.
       #  Can enable parallel tracing later.
       def self.start_tracing(controller)
+        Logger.log("Callstacking::Rails::Engine.start_tracing")
+        
         settings.enable!
 
         lock.synchronize do
@@ -57,6 +60,8 @@ module Callstacking
           instrumenter.add_span(span)
 
           if instrumenter.instrumentation_required?
+            Logger.log("Callstacking::Rails::Engine instrumenter.instrumentation_required? #{instrumenter.instrumentation_required?} #{loader.klasses.to_a}")
+
             loader.reset!
             instrumenter.enable!(loader.klasses.to_a)
           end
@@ -71,6 +76,8 @@ module Callstacking
       end
 
       def self.stop_tracing(controller)
+        Logger.log("Callstacking::Rails::Engine.stop_tracing")
+        
         settings.disable!
 
         trace = nil

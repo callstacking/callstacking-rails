@@ -46,5 +46,9 @@ jobs:
         run: bundle exec rake app:test:all
         continue-on-error: ${{ matrix.continue-on-error }}
         env:
+          GITHUB_OUTPUT: ${{ github.action_path }}/output.txt
           CALLSTACKING_API_TOKEN: ${{ secrets.CALLSTACKING_API_TOKEN }}
+
+      - name: Display progress
+        run: echo "Application logging ${{ steps.run_script.outputs.progress_output }}"
         
