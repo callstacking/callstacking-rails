@@ -7,18 +7,22 @@ module Callstacking
     class Trace
       include Callstacking::Rails::Helpers::HeadsUpDisplayHelper
       
-      attr_accessor :spans, :client, :lock
+      attr_accessor :spans, :client, :lock, :traces
       attr_reader :settings
       cattr_accessor :current_trace_id
       cattr_accessor :current_tuid
+      cattr_accessor :trace_log
 
       ICON = '💥'
       MAX_TRACE_ENTRIES = 3000
+      
+      @@trace_log||={}
 
       def initialize(spans)
-        @traces   = []
-        @spans    = spans
-        @settings = Callstacking::Rails::Settings.new
+
+        @traces    = []
+        @spans     = spans
+        @settings  = Callstacking::Rails::Settings.new
 
         @lock     = Mutex.new
         @client   = Callstacking::Rails::Client::Trace.new(settings.url, settings.auth_token)
@@ -29,6 +33,8 @@ module Callstacking
 
       def begin_trace(controller)
         @trace_id, @tuid = init_uuids(controller.request&.request_id || SecureRandom.uuid, TimeBasedUUID.generate)
+        trace_log[@trace_id] = controller.request&.original_url
+        
         init_callbacks(@tuid)
 
         start_request(@trace_id, @tuid,
@@ -48,6 +54,10 @@ module Callstacking
                          @traces, MAX_TRACE_ENTRIES)
 
         inject_hud(@settings, controller.request, controller.response)
+      end
+
+      def self.trace_log_clear
+        trace_log.clear
       end
 
       private

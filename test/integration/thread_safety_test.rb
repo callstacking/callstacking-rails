@@ -5,7 +5,12 @@ require "test_helper"
 class ThreadSafetyTest < ActionDispatch::IntegrationTest
   TEST_URL = "http://www.example.com"
 
+  # Test initiates multiple http requests and makes multiple method calls in parallel for each of the requests.
+  #   The results are validated against the Call Stacking server, ensuring that none of
+  #   the trace values are intermixed.
   test "concurrent tracing" do
+    ::Callstacking::Rails::Trace.trace_log_clear
+    
     urls      = {'/hello?debug=1'   => 'English',
                  '/bounjor?debug=1' => 'French',
                  '/hallo?debug=1'   => 'German'}
@@ -21,16 +26,13 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
     end
     threads.each(&:join)
 
-    urls.each do |url, klass|
-      response = client.show('xxxx', url: "#{TEST_URL}#{url}")
+    ::Callstacking::Rails::Trace.trace_log.each do |trace_id, url|
+      params   = url.gsub(TEST_URL, '')
+      response = client.show(trace_id)
       json     = response.body
-
-      sleep 20
-
-      ::Callstacking::Rails::Logger.log("url: #{url} -- json: #{json.inspect}")
-
+      
       json['trace_entries'][1..10].each do |trace_entry|
-        assert_equal klass, trace_entry['klass']
+        assert_equal urls[params], trace_entry['klass']
       end
     end
   end
