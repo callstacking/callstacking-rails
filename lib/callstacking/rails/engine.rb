@@ -62,8 +62,6 @@ module Callstacking
           instrumenter.add_span(span)
 
           if instrumenter.instrumentation_required?
-            Logger.log("Callstacking::Rails::Engine instrumenter.instrumentation_required? #{instrumenter.instrumentation_required?} #{loader.klasses.to_a}")
-
             loader.reset!
             instrumenter.enable!(loader.klasses.to_a)
           end

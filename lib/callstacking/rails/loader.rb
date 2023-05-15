@@ -14,16 +14,13 @@ module Callstacking
       def instrument_existing
         objs = []
         ObjectSpace.each_object(Module){|ob| objs << [ob, ((Object.const_source_location(ob.to_s) rescue nil))].flatten}
-        objs.each{|o| filter_klass(o.first, o.last)}
+        objs.each{|o| filter_klass(o.first, o.second)}
       end
 
       def on_load
         trace = TracePoint.new(:end) do |tp|
           klass = tp.self
           path  = tp.path
-
-          Logger.log("Callstacking::Rails::Loader.on_load #{klass} #{path}")
-          Logger.log("English defined? #{Object.const_defined?('English')}")
 
           filter_klass(klass, path)
         end
@@ -38,6 +35,9 @@ module Callstacking
 
       private
       def filter_klass(klass, path)
+        return if klass.nil? || path.nil?
+        return if path == false
+
         excluded_klass = excluded.any? { |ex| path =~ /#{ex}/ }
 
         if path =~ /#{::Rails.root.to_s}/ &&

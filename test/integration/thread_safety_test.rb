@@ -24,9 +24,7 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
       response = client.show('xxxx', url: "#{TEST_URL}#{url}")
       json     = response.body
 
-      STDERR.puts "Trace response: -- #{response.inspect} -- json #{json.inspect}"
-
-      sleep 5
+      sleep 20
       
       json['trace_entries'][1..10].each do |trace_entry|
         assert_equal klass, trace_entry['klass']
