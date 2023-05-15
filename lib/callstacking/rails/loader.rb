@@ -12,7 +12,7 @@ module Callstacking
       end
 
       def instrument_existing
-        ObjectSpace.each_object(Module){|ob| filter_klass(ob, (Object.const_source_location(ob.to_s) rescue nil))}
+        ObjectSpace.each_object(Module){|ob| filter_klass(ob, (Object.const_source_location(ob.to_s)&.first rescue nil))}
       end
 
       def on_load
