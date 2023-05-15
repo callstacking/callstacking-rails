@@ -30,6 +30,10 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
       params   = url.gsub(TEST_URL, '')
       response = client.show(trace_id)
       json     = response.body
+
+      ::Callstacking::Rails::Logger.Log "url: #{url} -- json: #{json.inspect}"
+      
+      sleep 10
       
       json['trace_entries'][1..10].each do |trace_entry|
         assert_equal urls[params], trace_entry['klass']

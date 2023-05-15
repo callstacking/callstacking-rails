@@ -52,7 +52,7 @@ module Callstacking
       end
 
       def enabled?
-        return Thread.current[CACHE_KEY] unless Thread.current[CACHE_KEY].nil?
+        return Thread.current[CACHE_KEY] if Thread.current[CACHE_KEY].present?
         return ActiveRecord::Type::Boolean.new.cast(ENV[ENV_KEY]) if ENV[ENV_KEY].present?
         false
       end
