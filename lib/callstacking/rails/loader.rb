@@ -17,7 +17,8 @@ module Callstacking
           path  = tp.path
 
           Logger.log("Callstacking::Rails::Loader.on_load #{klass} #{path}")
-          
+          Logger.log("English defined? #{Object.const_defined?('English')}")
+
           excluded_klass = excluded.any? { |ex| path =~ /#{ex}/ }
 
           if path =~ /#{::Rails.root.to_s}/ &&

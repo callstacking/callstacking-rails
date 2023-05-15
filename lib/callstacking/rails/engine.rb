@@ -37,7 +37,9 @@ module Callstacking
 
       config.after_initialize do
         Logger.log "Call Stacking loading (#{Callstacking::Rails::Env.environment})"
-        
+
+        Logger.log("English defined? #{Object.const_defined?('English')}")
+
         spans[Thread.current.object_id]||=Spans.new
         instrumenter.add_span(spans[Thread.current.object_id])
 
