@@ -31,7 +31,7 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
       response = client.show(trace_id)
       json     = response.body
 
-      ::Callstacking::Rails::Logger.Log "url: #{url} -- json: #{json.inspect}"
+      ::Callstacking::Rails::Logger.log "url: #{url} -- json: #{json.inspect}"
       
       sleep 10
       
