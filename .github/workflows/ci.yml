@@ -22,6 +22,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Dump runner information
+        run: echo ::set-env name=runner-diagnostics::$(runner-diagnostics)
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -46,5 +49,6 @@ jobs:
         run: bundle exec rake app:test:all
         continue-on-error: ${{ matrix.continue-on-error }}
         env:
+          ACTIONS_RUNNER_DEBUG: true
           CALLSTACKING_API_TOKEN: ${{ secrets.CALLSTACKING_API_TOKEN }}
         
