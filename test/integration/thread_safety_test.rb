@@ -1,4 +1,6 @@
 require "test_helper"
+require "callstacking/rails/logger"
+
 # CALLSTACKING_API_TOKEN required for these integration tests. Full end-to-end.
 # https://github.com/callstacking/callstacking-rails/settings/secrets/actions
 class ThreadSafetyTest < ActionDispatch::IntegrationTest
@@ -25,7 +27,9 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
       json     = response.body
 
       sleep 20
-      
+
+      Logger.log("url: #{url} -- json: #{json.inspect}")
+
       json['trace_entries'][1..10].each do |trace_entry|
         assert_equal klass, trace_entry['klass']
       end
