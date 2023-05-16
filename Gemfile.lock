@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    callstacking-rails (0.1.30)
+    callstacking-rails (0.1.31)
       faraday (>= 1.10.3)
       faraday-follow_redirects
       rails (>= 4)
@@ -157,7 +157,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.6.2-arm64-darwin)
-    thor (1.2.1)
+    thor (1.2.2)
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
