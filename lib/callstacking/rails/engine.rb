@@ -45,7 +45,6 @@ module Callstacking
         @@loader.instrument_existing
 
         loader.on_load
-        # loader.reset!
       end
 
       # Serialize all tracing requests for now.

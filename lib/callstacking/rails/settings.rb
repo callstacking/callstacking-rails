@@ -23,9 +23,7 @@ module Callstacking
       end
 
       def auth_token
-        x = ENV['CALLSTACKING_API_TOKEN'] || settings[:auth_token]
-        raise "No auth token found. #{ENV['CALLSTACKING_API_TOKEN']} Please run `callstacking login` to get one." if x.nil?
-        x
+        ENV['CALLSTACKING_API_TOKEN'] || settings[:auth_token]
       end
 
       def auth_token?
@@ -52,8 +50,8 @@ module Callstacking
       end
 
       def enabled?
-        return Thread.current[CACHE_KEY] if Thread.current[CACHE_KEY].present?
         return ActiveRecord::Type::Boolean.new.cast(ENV[ENV_KEY]) if ENV[ENV_KEY].present?
+        return Thread.current[CACHE_KEY] if Thread.current[CACHE_KEY].present?
         false
       end
 

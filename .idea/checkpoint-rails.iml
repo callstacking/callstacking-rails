@@ -75,7 +75,7 @@
     <orderEntry type="library" scope="PROVIDED" name="sprockets (v4.2.0, rbenv: 3.1.2) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sprockets-rails (v3.4.2, rbenv: 3.1.2) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sqlite3 (v1.6.2, rbenv: 3.1.2) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="thor (v1.2.1, rbenv: 3.1.2) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="thor (v1.2.2, rbenv: 3.1.2) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="timeout (v0.3.2, rbenv: 3.1.2) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tzinfo (v2.0.6, rbenv: 3.1.2) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="websocket-driver (v0.7.5, rbenv: 3.1.2) [gem]" level="application" />
@@ -430,10 +430,10 @@
               </RakeTaskImpl>
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Build callstacking-rails-0.1.30.gem into the pkg directory" fullCommand="build" id="build" />
+          <RakeTaskImpl description="Build callstacking-rails-0.1.31.gem into the pkg directory" fullCommand="build" id="build" />
           <RakeTaskImpl id="build">
             <subtasks>
-              <RakeTaskImpl description="Generate SHA512 checksum if callstacking-rails-0.1.30.gem into the checksums directory" fullCommand="build:checksum" id="checksum" />
+              <RakeTaskImpl description="Generate SHA512 checksum if callstacking-rails-0.1.31.gem into the checksums directory" fullCommand="build:checksum" id="checksum" />
             </subtasks>
           </RakeTaskImpl>
           <RakeTaskImpl description="Remove any temporary products" fullCommand="clean" id="clean" />
@@ -485,13 +485,13 @@
               </RakeTaskImpl>
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Build and install callstacking-rails-0.1.30.gem into system gems" fullCommand="install" id="install" />
+          <RakeTaskImpl description="Build and install callstacking-rails-0.1.31.gem into system gems" fullCommand="install" id="install" />
           <RakeTaskImpl id="install">
             <subtasks>
-              <RakeTaskImpl description="Build and install callstacking-rails-0.1.30.gem into system gems without network access" fullCommand="install:local" id="local" />
+              <RakeTaskImpl description="Build and install callstacking-rails-0.1.31.gem into system gems without network access" fullCommand="install:local" id="local" />
             </subtasks>
           </RakeTaskImpl>
-          <RakeTaskImpl description="Create tag v0.1.30 and build and push callstacking-rails-0.1.30.gem to rubygems.org" fullCommand="release[remote]" id="release[remote]" />
+          <RakeTaskImpl description="Create tag v0.1.31 and build and push callstacking-rails-0.1.31.gem to rubygems.org" fullCommand="release[remote]" id="release[remote]" />
           <RakeTaskImpl description="Report code statistics (KLOCs, etc) from the application or engine" fullCommand="stats" id="stats" />
           <RakeTaskImpl description="" fullCommand="environment" id="environment" />
           <RakeTaskImpl description="" fullCommand="load_app" id="load_app" />
