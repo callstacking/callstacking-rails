@@ -28,8 +28,17 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
 
     ::Callstacking::Rails::Trace.trace_log.each do |trace_id, url|
       params   = url.gsub(TEST_URL, '')
-      response = client.show(trace_id)
-      json     = response.body
+
+      # Retry until the trace is available
+      retry_count = 0
+      json = {'trace_entries' => []}
+      while json['trace_entries'].empty? && retry_count <= 50
+        response = client.show(trace_id)
+        json     = response.body
+
+        sleep 1
+        retry_count+=1
+      end
 
       ::Callstacking::Rails::Logger.log "url: #{url} -- json: #{json.inspect}"
       
