@@ -41,9 +41,8 @@ module Callstacking
         spans[Thread.current.object_id]||=Spans.new
         instrumenter.add_span(spans[Thread.current.object_id])
 
-        @@loader = Callstacking::Rails::Loader.new(instrumenter, excluded: settings.excluded + EXCLUDED_TEST_CLASSES)
-        @@loader.instrument_existing
-
+        @@loader = Callstacking::Rails::Loader.new(instrumenter,
+                                                   excluded: settings.excluded + EXCLUDED_TEST_CLASSES)
         loader.on_load
       end
 

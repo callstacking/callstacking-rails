@@ -148,8 +148,6 @@ module Callstacking
         lock.synchronize do
           return if traces.empty?
 
-          STDERR.puts "Sending #{traces.size} traces to Callstacking.io -- enabled? - #{settings.enabled?} -- #{traces.inspect}"
-
           client.upsert(trace_id,
                         { trace_entries: traces.deep_dup })
           traces.clear

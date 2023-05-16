@@ -4,14 +4,17 @@ require "callstacking/rails/logger"
 module Callstacking
   module Rails
     class Loader
-      attr_accessor :instrumenter, :klasses, :excluded
+      attr_accessor :instrumenter, :klasses, :excluded, :settings
       def initialize(instrumenter, excluded: [])
         @excluded = excluded
         @instrumenter = instrumenter
         @klasses = Set.new
+        @settings = Callstacking::Rails::Settings.new
+
+        preloaded_klasses
       end
 
-      def instrument_existing
+      def preloaded_klasses
         ObjectSpace.each_object(Module){|ob| filter_klass(ob, (Object.const_source_location(ob.to_s)&.first rescue nil))}
       end
 
@@ -41,7 +44,7 @@ module Callstacking
         if path =~ /#{::Rails.root.to_s}/ &&
           !klasses.include?(klass) &&
           !excluded_klass
-          instrumenter.instrument_klass(klass)
+          instrumenter.instrument_klass(klass) if settings.enabled?
           klasses << klass
         end
       end

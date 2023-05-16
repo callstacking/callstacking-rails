@@ -21,8 +21,6 @@ module Callstacking
           # https://github.com/lostisland/awesome-faraday
           @connection ||= Faraday.new(url) do |c|
             c.response :json
-            c.use Faraday::Response::Logger
-            # c.use Faraday::Response::Logger, nil, { headers: false, bodies: false }
             c.response :follow_redirects
             c.use Faraday::Response::RaiseError # raise exceptions on 40x, 50x responses
             c.request :json # This will set the "Content-Type" header to application/json and call .to_json on the body
