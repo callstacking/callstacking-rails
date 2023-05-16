@@ -4,6 +4,7 @@ require "test_helper"
 # https://github.com/callstacking/callstacking-rails/settings/secrets/actions
 class ThreadSafetyTest < ActionDispatch::IntegrationTest
   TEST_URL = "http://www.example.com"
+  MAX_RETRIES = 50
 
   # Test initiates multiple http requests and makes multiple method calls in parallel for each of the requests.
   #   The results are validated against the Call Stacking server, ensuring that none of
@@ -29,10 +30,10 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
     ::Callstacking::Rails::Trace.trace_log.each do |trace_id, url|
       params   = url.gsub(TEST_URL, '')
 
-      # Retry until the trace is available
+      # Retry until the trace is available.
       retry_count = 0
       json = {'trace_entries' => []}
-      while json['trace_entries'].empty? && retry_count <= 50
+      while json['trace_entries'].empty? && retry_count <= MAX_RETRIES
         response = client.show(trace_id)
         json     = response.body
 
