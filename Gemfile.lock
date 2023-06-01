@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    callstacking-rails (0.1.33)
+    callstacking-rails (0.1.34)
       faraday (>= 1.10.3)
       faraday-follow_redirects
       rails (>= 4)
@@ -79,7 +79,7 @@ GEM
     crass (1.0.6)
     date (3.3.3)
     erubi (1.12.0)
-    faraday (2.7.4)
+    faraday (2.7.5)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-follow_redirects (0.3.0)
