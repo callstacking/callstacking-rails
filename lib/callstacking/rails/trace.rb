@@ -195,8 +195,8 @@ module Callstacking
         !(track_request?(url))
       end
 
-      def do_not_track_request?(url, format)
-        return true if format == "*/*"
+      def do_not_track_request?(url, _format)
+        return true if %w[/health /health_check].any? {|u| url =~ /#{u}/i}
 
         (url =~ /(\/assets\/|\/stylesheets\/|\/javascripts\/|\/css\/|\/js\/|\.js|\.css)/i).present?
       end
