@@ -25,7 +25,7 @@ module Callstacking
             c.use Faraday::Response::RaiseError # raise exceptions on 40x, 50x responses
             c.request :json # This will set the "Content-Type" header to application/json and call .to_json on the body
             c.adapter Faraday.default_adapter
-            c.options.timeout = 5
+            c.options.timeout = 120
 
             if auth_token.present?
               c.request :authorization, :Bearer, auth_token
