@@ -122,7 +122,7 @@ module Callstacking
 
         h = param_names.map.with_index do |param, index|
           next if [:&, :*, :**].include?(param)
-          [param, args[index]]
+          [param, args[index].inspect]
         end.compact.to_h
 
         filter = ::Rails.application.config.filter_parameters

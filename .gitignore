@@ -10,3 +10,4 @@
 /test/dummy/tmp/
 /.idea/*
 *.gem
+.idea/checkpoint-rails.iml
