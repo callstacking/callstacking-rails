@@ -44,8 +44,12 @@ class ThreadSafetyTest < ActionDispatch::IntegrationTest
       ::Callstacking::Rails::Logger.log "url: #{url} -- json: #{json.inspect}"
       
       sleep 10
-      
-      json['trace_entries'][1..10].each do |trace_entry|
+
+      entry_classes  = json['trace_entries'].find_all do |trace_entry|
+        urls.values.include?(trace_entry['klass'])
+      end
+
+      entry_classes.each do |trace_entry|
         assert_equal urls[params], trace_entry['klass']
       end
     end

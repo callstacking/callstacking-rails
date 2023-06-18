@@ -5,9 +5,7 @@ module Callstacking
       attr_accessor :call_entry_callback, :call_return_callback
 
       def initialize
-        @nesting_level = -1
-        @order_num = -1
-        @previous_entry = nil
+        reset
       end
 
       def increment_order_num
@@ -38,6 +36,12 @@ module Callstacking
 
       def on_call_return(&block)
         @call_return_callback = block
+      end
+
+      def reset
+        @nesting_level = -1
+        @order_num = -1
+        @previous_entry = nil
       end
 
       private

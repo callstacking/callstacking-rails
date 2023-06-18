@@ -73,7 +73,7 @@ module Callstacking
         true
       end
 
-      def self.stop_tracing(controller)
+      def self.stop_tracing(controller, exception)
         Logger.log("Callstacking::Rails::Engine.stop_tracing")
         
         settings.disable!
@@ -86,8 +86,12 @@ module Callstacking
           end
         end
 
-        trace&.end_trace(controller)
-        
+        trace&.end_trace(controller, exception)
+
+        lock.synchronize do
+          spans[Thread.current.object_id]&.reset
+        end
+
         true
       end
     end

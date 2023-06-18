@@ -5,6 +5,11 @@ require "callstacking/rails/helpers/heads_up_display_helper"
 module Callstacking
   module Rails
     class Trace
+      TRACE_CALL_ENTRY  = 'TraceCallEntry'
+      TRACE_CALL_RETURN = 'TraceCallReturn'
+      TRACE_MESSAGE     = 'TraceMessage'
+      TRACE_EXCEPTION   = 'TraceException'
+
       include Callstacking::Rails::Helpers::HeadsUpDisplayHelper
       
       attr_accessor :spans, :client, :lock, :traces
@@ -44,16 +49,16 @@ module Callstacking
                       controller.request.headers, controller.request.params, @traces)
       end
 
-      def end_trace(controller)
+      def end_trace(controller, exception)
         return if @trace_id.nil? || @tuid.nil?
         
-        complete_request(@trace_id, @tuid,
+        complete_request(@trace_id, @tuid, exception,
                          controller.action_name, controller.controller_name,
                          controller.action_name, controller.request.format,
                          controller.request&.original_url,
                          @traces, MAX_TRACE_ENTRIES)
 
-        inject_hud(@settings, controller.request, controller.response)
+        inject_hud(@settings, controller.request, controller.response) if ::Rails.env.development? || ::Rails.env.test?
       end
 
       def self.trace_log_clear
@@ -87,10 +92,15 @@ module Callstacking
         "Started request: #{method} #{controller}##{action} as #{format}"
       end
 
+      def exception_message(exception, method, controller, action, format)
+        "#{exception.class} #{exception.message}<br/><br/>" \
+        "#{exception.backtrace[0]}".html_safe
+      end
+
       def create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
         lock.synchronize do
           traces << { tuid: tuid,
-                      type: 'TraceCallReturn',
+                      type: TRACE_CALL_RETURN,
                       order_num: order_num,
                       nesting_level: nesting_level,
                       local_variables: {},
@@ -109,7 +119,7 @@ module Callstacking
       def create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
         lock.synchronize do
           traces << { tuid: tuid,
-                      type: 'TraceCallEntry',
+                      type: TRACE_CALL_ENTRY,
                       order_num: order_num,
                       nesting_level: nesting_level,
                       args: arguments,
@@ -125,10 +135,10 @@ module Callstacking
         end
       end
 
-      def create_message(tuid, message, order_num, traces)
+      def create_message(tuid, message, order_num, traces, type = TRACE_MESSAGE)
         lock.synchronize do
           traces << { tuid: tuid,
-                      type: 'TraceMessage',
+                      type: type,
                       order_num: order_num,
                       nesting_level: 0,
                       message: message,
@@ -182,11 +192,17 @@ module Callstacking
         url
       end
 
-      def complete_request(trace_id, tuid, method, controller, action, format, original_url, traces, max_trace_entries)
+      def complete_request(trace_id, tuid, exception, method, controller,
+                           action, format, original_url, traces, max_trace_entries)
         return if do_not_track_request?(original_url, format)
 
-        create_message(tuid, completed_request_message(method, controller, action, format),
-                       spans.increment_order_num, traces)
+        if exception.present?
+          create_message(tuid, exception_message(exception, method, controller, action, format),
+                         spans.increment_order_num, traces, TRACE_EXCEPTION)
+        else
+          create_message(tuid, completed_request_message(method, controller, action, format),
+                         spans.increment_order_num, traces)
+        end
 
         send_traces!(trace_id, traces[0..max_trace_entries])
       end
