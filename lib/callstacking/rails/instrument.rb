@@ -39,8 +39,8 @@ module Callstacking
             
             method_name = __method__
 
-            path = method(__method__).super_method.source_location.first
-            line_no = method(__method__).super_method.source_location.last
+            path = method(__method__).super_method.source_location&.first || ''
+            line_no = method(__method__).super_method.source_location&.last || ''
 
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
@@ -64,8 +64,8 @@ module Callstacking
 
             method_name = __method__
 
-            path = method(__method__).super_method.source_location.first
-            line_no = method(__method__).super_method.source_location.last
+            path = method(__method__).super_method.source_location&.first || ''
+            line_no = method(__method__).super_method.source_location&.last || ''
 
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
