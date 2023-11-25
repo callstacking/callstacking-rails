@@ -5,12 +5,12 @@ module Callstacking
         extend ActiveSupport::Concern
         def callstacking_setup
           exception = nil
-          @last_callstacking_sample = TIme.utc.now
+          @last_callstacking_sample = Time.now.utc
           Callstacking::Rails::Engine.start_tracing(self)
 
           yield
         rescue Exception => e
-          @last_callstacking_exception = Time.utc.now
+          @last_callstacking_exception = Time.now.utc
           exception = e
           raise e
         ensure
