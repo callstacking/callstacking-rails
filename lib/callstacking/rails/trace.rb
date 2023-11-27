@@ -68,12 +68,12 @@ module Callstacking
       private
 
       def init_callbacks(tuid)
-        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no|
-          create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces)
+        @spans.on_call_entry do |nesting_level, order_num, klass, method_name, arguments, path, line_no, method_source|
+          create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, @traces, method_source)
         end
 
-        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val|
-          create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces)
+        @spans.on_call_return do |coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, method_source|
+          create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, @traces, method_source)
         end
       end
 
@@ -97,7 +97,7 @@ module Callstacking
         "#{exception.backtrace[0]}".html_safe
       end
 
-      def create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces)
+      def create_call_return(tuid, coupled_callee, nesting_level, order_num, klass, method_name, path, line_no, return_val, traces, method_source)
         lock.synchronize do
           traces << { tuid: tuid,
                       type: TRACE_CALL_RETURN,
@@ -112,11 +112,12 @@ module Callstacking
                       return_value: return_value(return_val),
                       coupled_callee: coupled_callee,
                       message: nil,
+                      method_source: method_source,
           }
         end
       end
 
-      def create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, traces)
+      def create_call_entry(tuid, nesting_level, order_num, klass, method_name, arguments, path, line_no, traces, method_source)
         lock.synchronize do
           traces << { tuid: tuid,
                       type: TRACE_CALL_ENTRY,
@@ -131,6 +132,7 @@ module Callstacking
                       coupled_callee: nil,
                       local_variables: {},
                       message: nil,
+                      method_source: method_source,
           }
         end
       end
@@ -150,6 +152,7 @@ module Callstacking
                       return_value: nil,
                       coupled_callee: false,
                       local_variables: {},
+                      method_source: '',
           }
         end
       end

@@ -42,6 +42,9 @@ module Callstacking
             path = method(__method__).super_method.source_location&.first || ''
             line_no = method(__method__).super_method.source_location&.last || ''
 
+            method_source = ''
+            method_source = method(__method__).super_method.source if settings.analyze_source?
+
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
             spans = tmp_module.instance_variable_get(:@spans)
@@ -50,9 +53,9 @@ module Callstacking
 
             arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
-            span.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            span.call_entry(klass, method_name, arguments, p || path, l || line_no, method_source)
             return_val = super(*args, &block)
-            span.call_return(klass, method_name, p || path, l || line_no, return_val)
+            span.call_return(klass, method_name, p || path, l || line_no, return_val, method_source)
 
             return_val
           end
@@ -67,6 +70,9 @@ module Callstacking
             path = method(__method__).super_method.source_location&.first || ''
             line_no = method(__method__).super_method.source_location&.last || ''
 
+            method_source = ''
+            method_source = method(__method__).super_method.source if settings.analyze_source?
+
             p, l = caller.find { |c| c.to_s =~ /#{::Rails.root.to_s}/}&.split(':')
 
             spans = tmp_module.instance_variable_get(:@spans)
@@ -75,9 +81,9 @@ module Callstacking
 
             arguments = Callstacking::Rails::Instrument.arguments_for(method(__method__).super_method, args)
 
-            span.call_entry(klass, method_name, arguments, p || path, l || line_no)
+            span.call_entry(klass, method_name, arguments, p || path, l || line_no, method_source)
             return_val = super(*args, **kwargs, &block)
-            span.call_return(klass, method_name, p || path, l || line_no, return_val)
+            span.call_return(klass, method_name, p || path, l || line_no, return_val, method_source)
 
             return_val
           end

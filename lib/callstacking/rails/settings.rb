@@ -63,10 +63,15 @@ module Callstacking
         !enabled?
       end
 
+      def analyze_source?
+        settings[:analyze_source] || false
+      end
+
       def save(email, password, url)
         props = { auth_token: '',
                   url: url,
-                  enabled: true
+                  enabled: true,
+                  analyze_source: false,
         }
 
         props = { Callstacking::Rails::Env.environment => {

@@ -4,6 +4,7 @@ PATH
     callstacking-rails (0.1.38)
       faraday (>= 1.10.3)
       faraday-follow_redirects
+      method_source
       rails (>= 4)
 
 GEM
